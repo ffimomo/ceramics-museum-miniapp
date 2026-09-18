@@ -1,0 +1,39 @@
+# ============================================================================
+# EditorConfig —— 统一编辑器行为
+# ============================================================================
+# 作用：让 Trae / VS Code / 微信开发者工具等支持 EditorConfig 的编辑器
+#       自动采用同一套缩进、行尾、编码规则，从源头消除格式漂移。
+#
+# 与本项目配套的 .gitattributes 一起，构成"行尾统一"的双保险：
+#   - .editorconfig  → 管编辑器怎么写盘
+#   - .gitattributes → 管 git 怎么存库
+# ============================================================================
+
+# 全局默认
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# 微信小程序源码：2 空格缩进、LF
+[*.{js,json,wxml,wxss,ts,tsx}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+
+# 配置文件
+[*.{yml,yaml,md}]
+indent_style = space
+indent_size = 2
+
+# 二进制/资源文件不做文本处理（EditorConfig 无 binary 概念，此处仅为可读性留白）
+# 图片、字体等文件不受上述规则影响
+
+[*.md]
+trim_trailing_whitespace = false

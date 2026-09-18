@@ -1,0 +1,46 @@
+# ============================================================================
+# Git 行尾统一策略（Git Attributes）
+# ============================================================================
+# 目的：强制仓库内所有文本文件统一使用 LF 行尾，杜绝 CRLF / LF 混用导致的
+#       「保存后整个文件都变了」假象，以及由此引发的编辑器误报「保存冲突」。
+#
+# 背景：本项目为微信小程序原生项目，在 Windows 上开发，Trae 编写代码、
+#       微信开发者工具预览。历史上 pages/splash/splash.wxss 曾被写成 CRLF，
+#       与其余 33 个 LF 文件不一致，导致每次保存都被整文件级重写。
+#
+# 用法：此文件生效后，运行一次 `git add --renormalize .` 使索引统一，
+#       再提交即可。
+# ============================================================================
+
+# ---- 默认：自动识别文本文件，统一以 LF 存入仓库 ----------------------------
+# text=auto   → Git 自动判断是否为文本文件并做行尾规范化
+# eol=lf      → 规范化后的行尾固定为 LF（不随平台变化）
+* text=auto eol=lf
+
+# ---- 显式声明为文本、强制 LF（防止 Git 误判）-------------------------------
+*.wxss   text eol=lf
+*.wxml   text eol=lf
+*.js     text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
+*.txt    text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+
+# ---- 二进制文件：禁止任何行尾转换 ------------------------------------------
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.ico    binary
+*.svg    binary
+*.ttf    binary
+*.otf    binary
+*.woff   binary
+*.woff2  binary
+*.zip    binary
+*.mp3    binary
+*.mp4    binary
