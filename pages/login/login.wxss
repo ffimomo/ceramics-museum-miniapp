@@ -293,20 +293,16 @@
 }
 
 /*
- * 密文态的眼睛图标（当前只提供了一张"睁眼"图）
+ * 说明：眼睛的明/暗文态由两张独立素材切换，不再靠 CSS 模拟
  * --------------------------------------------------------------------------
- * ⚠️ 说明：设计上「睁眼」= 显示密码、「闭眼」= 隐藏密码，本是两张图。
- *    目前素材只有一张睁眼图，故用降透明度 + 轻微缩小做视觉区分，
- *    让用户能看出当前处于哪种状态。
+ * - 睁眼 icon-eye.png       -> showPassword 为 true（明文）时显示
+ * - 闭眼 icon-eye-close.png -> showPassword 为 false（密文）时显示
+ * 两张图同源同色（--icon-secondary #B7AA9A），按 24x24 渲染时视觉重心
+ * 相差 0.26px，切换时无跳动。切换逻辑见 login.js 的 togglePassword()。
  *
- *    等你补上「闭眼」专用图后：
- *      1. 把 login.js 的 data.eyeIconClose 指向新图（data.eyeIconOpen 同理）
- *      2. 删掉下面 .field__eye-icon--off 这条规则
+ * 历史：素材只有一张睁眼图时，曾用一个修饰类降透明度 + 微缩来模拟闭眼；
+ *      闭眼图补齐后，该规则与 WXML 中的对应类名均已移除。
  */
-.field__eye-icon--off {
-  opacity: 0.42;
-  transform: scale(0.92);
-}
 
 /* 眼睛 icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
 .field__eye-placeholder {

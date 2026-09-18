@@ -117,6 +117,7 @@
         <!-- 眼睛 icon（右侧，明/暗文切换）
              ⚠️ 切换逻辑：src 绑定 {{eyeIcon}}，由 login.js 的
                 togglePassword() 在 eyeIconOpen / eyeIconClose 之间切换。
+                睁眼=明文态、闭眼=密文态，已是两张独立素材，无需额外类名。
                 换图改 login.js 的 data 即可，不用动这里。 -->
         <view
           class="field__eye"
@@ -125,7 +126,7 @@
           aria-label="切换密码显示"
         >
           <image
-            class="field__eye-icon {{showPassword ? '' : 'field__eye-icon--off'}}"
+            class="field__eye-icon"
             src="{{eyeIcon}}"
             mode="aspectFit"
             aria-hidden="true"

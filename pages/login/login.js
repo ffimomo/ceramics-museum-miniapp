@@ -5,7 +5,7 @@
  *
  * ⚠️ 图片资源说明
  *   所有图片路径集中在 data 里（bgImage / logoImage / iconBookmark / iconLock /
- *   eyeIcon / iconWechat / iconQQ）。
+ *   eyeIconOpen / eyeIconClose / iconWechat / iconQQ）。
  *   换图时只需改对应字段的路径，无需改 WXML。
  *   背景图已转 WebP（原 PNG 560.8KB -> 21.0KB，原图备份在 assets/_originals_png/）。
  *
@@ -39,17 +39,21 @@ Page({
     iconLock: '/assets/icons/icon-lock.png',
     /**
      * 密码框右侧眼睛 icon：跟随 showPassword 自动切换
-     * 初始 showPassword = false（密文态），故取 Close 图
+     * 初始 showPassword = false（密文态），故取「闭眼」图
      */
-    eyeIcon: '/assets/icons/icon-eye.png',
-    /** 眼睛图标（明文状态，即「当前已显示密码」）
-     *  ⚠️ 目前与 eyeIconClose 共用同一张图。
-     *     等你补一张「睁眼」专用图后，把这里指向新文件即可（如 icon-eye-open）。
-     *     随后可删除 wxss 中 .field__eye-icon--off 的降透明度规则。 */
+    eyeIcon: '/assets/icons/icon-eye-close.png',
+    /**
+     * 眼睛图标（睁眼）：showPassword = true 时使用 ——
+     * 语义为「密码当前是明文，点它可隐藏」。
+     * 两张图同源同色（RGB 183,170,154 = --icon-secondary #B7AA9A），
+     * 按同一尺寸渲染时视觉重心一致（差 0.26px），切换不跳动。
+     */
     eyeIconOpen: '/assets/icons/icon-eye.png',
-    /** 眼睛图标（密文状态，即「当前已隐藏密码」）
-     *  ⚠️ 同上，目前与 eyeIconOpen 共用一张图，靠 --off 类做视觉区分。 */
-    eyeIconClose: '/assets/icons/icon-eye.png',
+    /**
+     * 眼睛图标（闭眼）：showPassword = false 时使用 ——
+     * 语义为「密码当前是密文，点它可显示」。
+     */
+    eyeIconClose: '/assets/icons/icon-eye-close.png',
     /** 微信登录 icon */
     iconWechat: '/assets/icons/icon-wechat.png',
     /** QQ 登录 icon */
