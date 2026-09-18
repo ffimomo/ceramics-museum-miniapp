@@ -16,8 +16,8 @@
   <!-- ========================================================================
        一、背景层
        ------------------------------------------------------------------------
-       米黄色宣纸 / 陶瓷质感背景图（已接入，src 直接指向本地素材）
-       ⚠️ 换图改这里的 src，或改 login.js 的 data.bgImage 后回到 {{bgImage}} 绑定
+       米黄色宣纸 / 陶瓷质感背景图
+       ⚠️ 换图改 login.js 的 data.bgImage 即可
 
        叠放顺序（由下到上）：
          1. .login 根容器        backgroundColor 兜底底色（z-index auto）
@@ -25,10 +25,14 @@
          3. .login__content      页面内容，z-index 2
 
        底色兜底由 .login 根容器的 background-color 承担，不再单独设节点。
+
+       ⚠️ 路径必须用【正斜杠 /】。写成 assets\images\x.webp 时，
+          WXML 会把 \\ 当转义符吃掉，路径塌成 assetsimagesx.webp，
+          真机报 500 无法加载图片。素材统一走 js 变量绑定，避免手写路径。
        ======================================================================== -->
   <image
     class="login__bg"
-    src="assets\images\login-bg.webp"
+    src="{{bgImage}}"
     mode="aspectFill"
     aria-hidden="true"
   />
