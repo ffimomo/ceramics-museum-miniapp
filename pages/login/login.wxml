@@ -23,13 +23,11 @@
        ======================================================================== -->
   <image
     class="login__bg"
-    src="{{bgImage}}"
+    src="/assets/images/login-bg.png"
     mode="aspectFill"
     aria-hidden="true"
   />
-
-  <!-- 背景兜底蒙版：图片未填时也能呈现米黄宣纸质感 -->
-  <view class="login__bg-fallback" aria-hidden="true" />
+  
 
   <!-- ========================================================================
        二、内容层
@@ -44,14 +42,10 @@
            设计稿尺寸约 108 × 130 px（@2x → 逻辑 54 × 65） -->
       <image
         class="brand__logo"
-        src="{{logoImage}}"
+        src="/assets/icons/login-logo.png"
         mode="aspectFit"
         aria-label="陶瓷博物馆标志"
       />
-      <!-- 图片未填时的占位框（可删除，仅用于预览版式） -->
-      <view class="brand__logo-placeholder" aria-hidden="true">
-        <text class="brand__logo-placeholder-text">LOGO</text>
-      </view>
 
       <text class="brand__name-cn">陶瓷博物馆</text>
       <text class="brand__name-en">Ceramics Museum</text>
@@ -72,12 +66,10 @@
              填图示例：src="/assets/icons/icon-phone.png" -->
         <image
           class="field__icon"
-          src="{{iconPhone}}"
+          src="/assets/icons/icon-phone.png"
           mode="aspectFit"
           aria-hidden="true"
         />
-        <!-- icon 留空时的占位（可删除） -->
-        <view class="field__icon-placeholder" aria-hidden="true" />
 
         <!-- icon 与输入区之间的竖分隔线（设计稿中有） -->
         <view class="field__sep" aria-hidden="true" />
@@ -105,7 +97,7 @@
              填图示例：src="/assets/icons/icon-lock.png" -->
         <image
           class="field__icon"
-          src="{{iconLock}}"
+          src="/assets/icons/icon-lock.png"
           mode="aspectFit"
           aria-hidden="true"
         />
