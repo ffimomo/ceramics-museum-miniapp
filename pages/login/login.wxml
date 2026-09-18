@@ -16,14 +16,13 @@
   <!-- ========================================================================
        一、背景层
        ------------------------------------------------------------------------
-       ⚠️ 素材位：米黄色宣纸 / 陶瓷质感背景图
-          把 src 改成你的图片路径即可，例如：
-          src="/assets/images/login-bg.png"
-          建议尺寸：860 × 1984 px（@2x），或纯 CSS 渐变兜底（已内置）
+       米黄色宣纸 / 陶瓷质感背景图
+       ⚠️ 换图改 login.js 的 data.bgImage 即可
+       下方 login__bg-fallback 是图片未加载前的兜底底色
        ======================================================================== -->
   <image
     class="login__bg"
-    src="/assets/images/login-bg.png"
+    src="{{bgImage}}"
     mode="aspectFill"
     aria-hidden="true"
   />
@@ -37,12 +36,11 @@
     <!-- ===== 品牌区 ===== -->
     <view class="brand">
 
-      <!-- ⚠️ 素材位：花瓶线稿 Logo
-           src 留空，填图路径例如 "/assets/icons/login-logo.png"
-           设计稿尺寸约 108 × 130 px（@2x → 逻辑 54 × 65） -->
+      <!-- 花瓶线稿 Logo
+           ⚠️ 换图改 login.js 的 data.logoImage 即可 -->
       <image
         class="brand__logo"
-        src="/assets/icons/login-logo.png"
+        src="{{logoImage}}"
         mode="aspectFit"
         aria-label="陶瓷博物馆标志"
       />
@@ -61,12 +59,11 @@
            手机号输入框
            ------------------------------------------------------------------ -->
       <view class="field {{phoneFocus ? 'field--focus' : ''}}">
-        <!-- ⚠️ 素材位：书签样式的 icon（左侧）
-             建议尺寸 36 × 36 px（@2x → 逻辑 18 × 18）
-             填图示例：src="/assets/icons/icon-phone.png" -->
+        <!-- 左侧书签 icon
+             ⚠️ 换图改 login.js 的 data.iconPhone 即可 -->
         <image
           class="field__icon"
-          src="/assets/icons/icon-phone.png"
+          src="{{iconPhone}}"
           mode="aspectFit"
           aria-hidden="true"
         />
@@ -92,16 +89,14 @@
            密码输入框
            ------------------------------------------------------------------ -->
       <view class="field {{pwdFocus ? 'field--focus' : ''}}">
-        <!-- ⚠️ 素材位：锁 icon（左侧）
-             建议尺寸 36 × 36 px（@2x → 逻辑 18 × 18）
-             填图示例：src="/assets/icons/icon-lock.png" -->
+        <!-- 左侧锁 icon
+             ⚠️ 换图改 login.js 的 data.iconLock 即可 -->
         <image
           class="field__icon"
-          src="/assets/icons/icon-lock.png"
+          src="{{iconLock}}"
           mode="aspectFit"
           aria-hidden="true"
         />
-        <view class="field__icon-placeholder" aria-hidden="true" />
 
         <!-- icon 与输入区之间的竖分隔线（设计稿中有） -->
         <view class="field__sep" aria-hidden="true" />
@@ -119,16 +114,10 @@
           bindconfirm="onLogin"
         />
 
-        <!-- ⚠️ 素材位：眼睛 icon（右侧，明/暗文切换）
-             建议尺寸 40 × 40 px（@2x → 逻辑 20 × 20）
-             ● 显示密码时用 icon-eye-open.png
-             ● 隐藏密码时用 icon-eye-close.png
-
-             ⚠️ 填图方式：不要直接在这里写死文件名，而是回到 login.js 的 data 里
-                设置 eyeIconOpen / eyeIconClose，代码会自动按状态切换：
-                  eyeIconOpen:  '/assets/icons/icon-eye-open.png',
-                  eyeIconClose: '/assets/icons/icon-eye-close.png',
-                然后本节点的 src="{{eyeIcon}}" 就会自动生效。 -->
+        <!-- 眼睛 icon（右侧，明/暗文切换）
+             ⚠️ 切换逻辑：src 绑定 {{eyeIcon}}，由 login.js 的
+                togglePassword() 在 eyeIconOpen / eyeIconClose 之间切换。
+                换图改 login.js 的 data 即可，不用动这里。 -->
         <view
           class="field__eye"
           bindtap="togglePassword"
@@ -136,15 +125,11 @@
           aria-label="切换密码显示"
         >
           <image
-            class="field__eye-icon"
+            class="field__eye-icon {{showPassword ? '' : 'field__eye-icon--off'}}"
             src="{{eyeIcon}}"
             mode="aspectFit"
             aria-hidden="true"
           />
-          <!-- icon 留空时的占位（可删除） -->
-          <view class="field__eye-placeholder" aria-hidden="true">
-            <text class="field__eye-placeholder-text">👁</text>
-          </view>
         </view>
       </view>
 
@@ -198,9 +183,8 @@
       <!-- 两个圆形按钮 -->
       <view class="third__btns">
 
-        <!-- ⚠️ 素材位：微信登录图标（圆形按钮内的 icon）
-             建议尺寸 56 × 56 px（@2x → 逻辑 28 × 28）
-             填图示例：src="/assets/icons/icon-wechat.png" -->
+        <!-- 微信登录图标
+             ⚠️ 更换图标改 login.js 的 data.iconWechat 即可 -->
         <view class="third__btn" bindtap="onWechatLogin" hover-class="third__btn--hover">
           <image
             class="third__btn-icon"
@@ -208,14 +192,10 @@
             mode="aspectFit"
             aria-hidden="true"
           />
-          <view class="third__btn-placeholder" aria-hidden="true">
-            <text class="third__btn-placeholder-text">微信</text>
-          </view>
         </view>
 
-        <!-- ⚠️ 素材位：QQ 登录图标
-             建议尺寸 56 × 56 px（@2x → 逻辑 28 × 28）
-             填图示例：src="/assets/icons/icon-qq.png" -->
+        <!-- QQ 登录图标
+             ⚠️ 更换图标改 login.js 的 data.iconQQ 即可 -->
         <view class="third__btn" bindtap="onQQLogin" hover-class="third__btn--hover">
           <image
             class="third__btn-icon"
@@ -223,9 +203,6 @@
             mode="aspectFit"
             aria-hidden="true"
           />
-          <view class="third__btn-placeholder" aria-hidden="true">
-            <text class="third__btn-placeholder-text">QQ</text>
-          </view>
         </view>
 
       </view>

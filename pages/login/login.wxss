@@ -289,6 +289,24 @@
 .field__eye-icon {
   width: calc(22 / 430 * 100vw);
   height: calc(22 / 430 * 100vw);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/*
+ * 密文态的眼睛图标（当前只提供了一张"睁眼"图）
+ * --------------------------------------------------------------------------
+ * ⚠️ 说明：设计上「睁眼」= 显示密码、「闭眼」= 隐藏密码，本是两张图。
+ *    目前素材只有一张睁眼图，故用降透明度 + 轻微缩小做视觉区分，
+ *    让用户能看出当前处于哪种状态。
+ *
+ *    等你补上「闭眼」图后，只需在 login.js 的 data 里设置：
+ *      eyeIconOpen:  '/assets/icons/icon-eye-open.png',
+ *      eyeIconClose: '/assets/icons/icon-eye-close.png',
+ *    然后删掉下面 .field__eye-icon--off 这条规则即可。
+ */
+.field__eye-icon--off {
+  opacity: 0.42;
+  transform: scale(0.92);
 }
 
 /* 眼睛 icon 占位（素材未填时可见）—— 填好图后可删除此节点 */

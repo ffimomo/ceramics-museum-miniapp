@@ -23,26 +23,33 @@ const REMEMBER_KEY = 'remember_login';
 Page({
   data: {
     /* ======================================================================
-       图片资源路径（全部留空，由你后续填入）
+       图片资源路径
+       ----------------------------------------------------------------------
+       ⚠️ 修改图片只需改这里，不用动 WXML
        ====================================================================== */
-    /** 背景图：米黄宣纸 / 陶瓷质感，建议 860 × 1984 px（@2x） */
-    bgImage: '',
-    /** 品牌 Logo：花瓶线稿，建议 124 × 150 px（@2x） */
-    logoImage: '',
-    /** 手机号输入框左侧 icon：书签样式，建议 40 × 40 px（@2x） */
-    iconPhone: '',
-    /** 密码输入框左侧 icon：锁，建议 40 × 40 px（@2x） */
-    iconLock: '',
-    /** 密码框右侧眼睛 icon：跟随 showPassword 自动切换 */
-    eyeIcon: '',
-    /** 眼睛图标（明文状态，即"当前已显示密码"）—— 填图后此处生效 */
-    eyeIconOpen: '',
-    /** 眼睛图标（密文状态，即"当前已隐藏密码"）—— 填图后此处生效 */
-    eyeIconClose: '',
-    /** 微信登录 icon，建议 56 × 56 px（@2x） */
-    iconWechat: '',
-    /** QQ 登录 icon，建议 56 × 56 px（@2x） */
-    iconQQ: '',
+    /** 背景图：米黄宣纸 / 陶瓷质感 */
+    bgImage: '/assets/images/login-bg.png',
+    /** 品牌 Logo：花瓶线稿 */
+    logoImage: '/assets/icons/login-logo.png',
+    /** 手机号输入框左侧 icon：书签样式 */
+    iconPhone: '/assets/icons/icon-phone.png',
+    /** 密码输入框左侧 icon：锁 */
+    iconLock: '/assets/icons/icon-lock.png',
+    /**
+     * 密码框右侧眼睛 icon：跟随 showPassword 自动切换
+     * 初始 showPassword = false（密文态），故取 Close 图
+     */
+    eyeIcon: '/assets/icons/icon-eye.png',
+    /** 眼睛图标（明文状态，即「当前已显示密码」）
+     *  ⚠️ 等有「睁眼」专用素材后可改为 '/assets/icons/icon-eye-open.png' */
+    eyeIconOpen: '/assets/icons/icon-eye.png',
+    /** 眼睛图标（密文状态，即「当前已隐藏密码」）
+     *  ⚠️ 等有「闭眼」专用素材后可改为 '/assets/icons/icon-eye-close.png' */
+    eyeIconClose: '/assets/icons/icon-eye.png',
+    /** 微信登录 icon */
+    iconWechat: '/assets/icons/icon-wechat.png',
+    /** QQ 登录 icon */
+    iconQQ: '/assets/icons/icon-qq.png',
 
     /* ======================================================================
        表单数据
