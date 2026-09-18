@@ -1,0 +1,6 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "展品",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 100
+}

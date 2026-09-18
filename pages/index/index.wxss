@@ -1,0 +1,18 @@
+/* pages/index/index.wxss — 首页样式
+   ⚠️ 空占位，不含界面实现代码。
+
+   约定：
+   - 色值 / 字号 / 间距一律引用 app.wxss 中的语义令牌
+   - 尺寸单位统一使用 rpx（或按项目适配方案换算的 vw）
+
+   示例：
+   .page {
+     padding: 0 var(--page-padding-x);
+     background-color: var(--color-bg-page);
+   }
+*/
+
+.page {
+  /* TODO: 首页样式待按设计稿实现 */
+  min-height: 100vh;
+}

@@ -1,0 +1,16 @@
+<!--pages/mine/mine.wxml — 我的
+  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
+-->
+<view class="page">
+
+  <!-- 用户信息区挂载点 -->
+  <view class="profile">
+    <!-- TODO: 用户信息待按设计稿实现 -->
+  </view>
+
+  <!-- 功能入口区挂载点 -->
+  <view class="main">
+    <!-- TODO: 功能列表待按设计稿实现 -->
+  </view>
+
+</view>

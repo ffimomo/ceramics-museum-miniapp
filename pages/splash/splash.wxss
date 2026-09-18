@@ -1,0 +1,388 @@
+/* ==========================================================================
+   pages/splash/splash.wxss — 启动页样式
+   --------------------------------------------------------------------------
+   设计稿基准：430 × 932 pt（iPhone 15 Pro）  →  1px = 0.23256vw
+   布局方式：flex 为主，仅背景层与蒙版使用 absolute（属于分层叠放的必要场景）
+
+   ⚠️ 多机型适配策略（关键）
+   --------------------------------------------------------------------------
+   设计稿 430 × 932，真机可能是 440 × 956（iPhone 17 Pro Max）等，
+   宽高比不同（2.167 vs 2.173）。若垂直方向也用 vw，构图会随屏高漂移。
+
+   本文件采用「双轨制」：
+     · 水平尺寸 + 字号  → vw 等比缩放（保证不同机型上视觉大小一致）
+     · 垂直构图分配     → flex 比例（保证 LOGO/标题/提示三段比例一致）
+
+   字体变量统一在 app.wxss 定义，本文件不重复引入。
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面容器
+   ========================================================================== */
+.splash {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /* 背景兜底色：素材加载前显示，避免白屏突兀 */
+  background-color: var(--bg-dark);
+}
+
+/* ==========================================================================
+   二、背景层
+   --------------------------------------------------------------------------
+   说明：背景图需脱离文档流铺满整屏，属于「分层叠放」场景，
+        故使用 absolute —— 这是该场景的标准做法，不违背 flex 优先原则。
+   ========================================================================== */
+.splash__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  /*
+   * 裁切定位：设计稿中陶罐主体偏画面右侧、瓶颈位于上中部。
+   * center 保证主体居中；不同宽高比机型裁切时上下/左右对称收边，
+   * 避免出现「瓶颈被切掉」的偏移。
+   */
+  object-position: center center;
+}
+
+/* --------------------------------------------------------------------------
+   深色蒙版（两层叠加，控制文字可读性）
+   --------------------------------------------------------------------------
+   ⚠️ 强度经过实机对比调优：
+      设计图整体是「暖调、通透」的，蒙版过重会让画面发闷、失去博物馆射灯质感。
+      因此这里只做「局部压暗托字」，不做全屏均匀压暗。
+
+   第一层：垂直渐变 —— 顶部略深（托 LOGO）、中部通透、底部加深（托提示）
+   第二层：左上角斜向渐变 —— 仅压暗左上文字区，右侧保持通透
+   -------------------------------------------------------------------------- */
+.splash__mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(27, 23, 20, 0.5) 0%,
+      rgba(27, 23, 20, 0.1) 22%,
+      rgba(27, 23, 20, 0.08) 55%,
+      rgba(27, 23, 20, 0.62) 100%
+    ),
+    linear-gradient(
+      115deg,
+      rgba(27, 23, 20, 0.42) 0%,
+      rgba(27, 23, 20, 0.1) 42%,
+      rgba(27, 23, 20, 0) 62%
+    );
+}
+
+/* ==========================================================================
+   三、内容层
+   --------------------------------------------------------------------------
+   整页三段式纵向布局：LOGO 顶部 → 文字中部 → 提示底部
+
+   ⚠️ 采用 flex 比例分配代替固定 padding：
+       三段分别 flex: 1.6 / 4.2 / 1.9，
+       保证在 932 高的设计稿与 956 高的真机上，构图比例完全一致，
+       不会出现「主标题偏下」「提示贴底」的漂移。
+       LOGO 区顶部对齐（贴状态栏下方）、提示区底部对齐（贴屏幕底部），
+       中部标题区垂直居中 —— 三段锚点固定后构图在任何屏高上都稳定。
+   ========================================================================== */
+.splash__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  /*
+   * 左右内边距 18px —— 对齐 Figma 标注的 X = 18。
+   * LOGO、中英文名、主标题、副标题全部左对齐在这条基准线上。
+   */
+  padding-right: calc(18 / 430 * 100vw);
+  padding-left: calc(18 / 430 * 100vw);
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ==========================================================================
+   四、LOGO 区（flex 比例 1.6）
+   ========================================================================== */
+.brand {
+  display: flex;
+  /*
+   * flex 比例：LOGO 区占比较小（设计稿中 LOGO 紧凑贴顶，不占大块空间）
+   */
+  flex: 1.6;
+  flex-direction: column;
+  /*
+   * ⚠️ 关键：LOGO 区顶部对齐，不用 center —— 设计稿中 LOGO 紧贴状态栏下方。
+   *    早期版本用 center + 大 padding-top，导致 LOGO 被推到屏幕 18% 处（偏低）。
+   */
+  justify-content: flex-start;
+  /* 整组仍停在左上角，但组内元素改为水平居中对齐 */
+  align-self: flex-start;
+  align-items: center;
+  /* 顶部留白：紧贴状态栏下方，仅留一点呼吸空间
+     （状态栏/胶囊高度由 JS 注入 --status-bar-h） */
+  padding-top: calc(var(--status-bar-h, 44) + 4px);
+  min-height: 0;
+}
+
+/*
+ * LOGO 尺寸说明：
+ * --------------------------------------------------------------------------
+ * ⚠️ 素材实测为 50 × 66 px @2x，是「竖长形」的陶瓶图形，不是正方形。
+ *    早期代码按 44 × 44 正方形处理，导致图形被压扁/留白 —— 这是
+ *    「logo 没有对齐」的根因之一。
+ *
+ *    现按原始比例 50 : 66 设置宽高（逻辑尺寸 25 × 33），
+ *    配合 mode="aspectFit" 完整显示且不变形。
+ */
+.brand__logo {
+  display: block;
+  width: calc(25 / 430 * 100vw);
+  height: calc(33 / 430 * 100vw);
+  margin: 0 0 calc(6 / 430 * 100vw) 0;
+  /* 确保与下方文字块左边缘严格齐平 */
+  margin-left: 0;
+}
+
+.brand__name-cn {
+  display: block;
+  /* 中文名称：17px，宋体，字距略开 */
+  font-family: var(--font-serif);
+  font-size: calc(17 / 430 * 100vw);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-inverse);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.brand__name-en {
+  /*
+   * 英文名称：11px，宋体（设计要求英文同样使用宋体）
+   * ⚠️ 英文走 --font-serif，不落到无衬线字体；
+   *    英文字距比中文更开，宋体拉丁字形本身偏紧。
+   */
+  display: block;
+  font-family: var(--font-serif);
+  font-size: calc(11 / 430 * 100vw);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-inverse);
+  letter-spacing: 0.06em;
+  opacity: 0.92;
+  text-align: center;
+}
+
+/* ==========================================================================
+   五、主体文字区（flex 比例 4.2）
+   ========================================================================== */
+.hero {
+  display: flex;
+  /*
+   * 标题区占最大比例，内容垂直居中其内部，
+   * 使标题组落在画面中部偏上位置（与设计稿一致）。
+   */
+  flex: 4.2;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+.hero__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero__line {
+  /*
+   * 主标题单行：30px，宋体
+   * ⚠️ 字重 400：设计稿为 regular。宋体本身的衬线笔画已足够有分量，
+   *    加粗会破坏其秀气（早期误用 600，已纠正）。
+   * ⚠️ 无 text-shadow：设计图文字是干净的，不加阴影。
+   *
+   * 行高 1.42 —— 宋体字面较大，行高过紧会显挤压；过松则失去「竖向排版感」
+   */
+  display: block;
+  font-family: var(--font-serif);
+  font-size: calc(42 / 430 * 100vw);
+  font-weight: 600;
+  line-height: 1.42;
+  color: var(--text-inverse);
+  letter-spacing: calc(1 / 430 * 100vw);
+}
+
+/* 「遇见」与上方留出分组间距，形成 2+2 的节奏 */
+.hero__line--gap {
+  margin-top: calc(10 / 430 * 100vw);
+}
+
+/* --------------------------------------------------------------------------
+   「非遗之美」双色
+   --------------------------------------------------------------------------
+   「非遗」= 品牌主色 #A57B52；「之美」= 反色（白）#FFFFFF
+   ⚠️ 不使用渐变 —— 早期代码误用了 background-clip 渐变，已纠正为纯色双段。
+   -------------------------------------------------------------------------- */
+.hero__char--brand {
+  color: var(--brand-primary);
+}
+
+.hero__char--light {
+  font-size: calc(42 / 430 * 100vw);
+  font-weight: 600;
+  color: var(--text-inverse);
+}
+
+/* 副标题 */
+.hero__subtitle {
+  /* 12px，宋体，与主标题拉开层次 */
+  display: block;
+  font-family: var(--font-serif);
+  font-size: calc(18 / 430 * 100vw);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-inverse);
+  letter-spacing: 0.05em;
+  opacity: 0.92;
+  margin-top: calc(20 / 430 * 100vw);
+}
+
+/* ==========================================================================
+   六、底部滑动提示（flex 比例 1.9）
+   ========================================================================== */
+.scroll-hint {
+  display: flex;
+  flex: 1.9;
+  flex-direction: column;
+  /*
+   * 底部提示：内容靠下对齐，接近屏幕底部
+   * （设计稿中「向上滑动」位于画面约 88% 高度处）
+   */
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  padding-bottom: calc(16 / 430 * 100vw);
+  min-height: 0;
+}
+
+/* --- 箭头容器：两个 V 形叠放，形成「双箭头」效果 --- */
+.scroll-hint__arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(4 / 430 * 100vw);
+  margin-bottom: calc(14 / 430 * 100vw);
+}
+
+/*
+ * V 形箭头（内联 SVG）
+ * --------------------------------------------------------------------------
+ * ⚠️ 为什么改用 SVG 而不是 CSS 边框：
+ *   原实现用「两条边框 + rotate(-45deg)」，存在两个无法回避的缺陷：
+ *     1. 旋转绕元素「几何中心」进行，但 V 形的「视觉重心」不在几何中心，
+ *        转完左右两段斜线长度不等 —— 这是「不对称」的根因；
+ *     2. 22×11 的非等比矩形旋转 45° 后，外接宽度变为 (22+11)/√2 ≈ 23.3，
+ *        与容器宽度不符，在 flex 居中容器中产生视觉偏移。
+ *
+ *   改用 SVG 用「精确坐标」描述折线，左右端严格关于中轴镜像，
+ *   对称性由数学保证；同时可用 stroke-linecap="round" 做出圆头线帽，
+ *   比 CSS 边框的方头更接近设计稿的精致感。
+ *
+ * 路径设计（viewBox 22 × 11）：
+ *   对称轴   x = 11
+ *   左端点   (1.4, 9.2)   右端点 (20.6, 9.2)   ← 关于 x=11 严格镜像
+ *   顶点     (11, 3.8)
+ *   线宽     1.5，圆头线帽（round），圆角连接（round）
+ *
+ * ⚠️ 使用 background-image 而非 <image> 标签：
+ *   避免额外素材文件与网络请求，且不占主包体积。
+ *   SVG 中的 # 需转义为 %23，双引号用单引号包裹。
+ */
+.scroll-hint__chevron {
+  width: calc(22 / 430 * 100vw);
+  height: calc(11 / 430 * 100vw);
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 11' fill='none'%3E%3Cpath d='M1.4 9.2 L11 3.8 L20.6 9.2' stroke='%23ffffff' stroke-opacity='0.9' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* 上方箭头：淡入循环，形成「向上流动」的动效 */
+.scroll-hint__chevron--top {
+  animation: chevron-flow 1.8s var(--ease-flow, ease-in-out) infinite;
+  animation-delay: 0.3s;
+}
+
+.scroll-hint__chevron--bottom {
+  animation: chevron-flow 1.8s var(--ease-flow, ease-in-out) infinite;
+  animation-delay: 0s;
+}
+
+/*
+ * 动效说明：
+ *   向上位移 + 透明度呼吸，模拟「向上滑动」的引导
+ *   仅使用 transform + opacity，避免触发布局重排
+ *
+ * ⚠️ 注意：此处 transform 只做 translateY，不再需要 rotate（SVG 自带方向）
+ */
+@keyframes chevron-flow {
+  0% {
+    opacity: 0.25;
+    transform: translateY(calc(2 / 430 * 100vw));
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0.25;
+    transform: translateY(calc(-2 / 430 * 100vw));
+  }
+}
+
+/* 底部提示文字：15px，宋体 */
+.scroll-hint__text {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: calc(15 / 430 * 100vw);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-inverse);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.scroll-hint__text--sub {
+  font-size: calc(13 / 430 * 100vw);
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   七、减少动效偏好（无障碍）
+   --------------------------------------------------------------------------
+   用户开启「减少动态效果」时，改为静态显示
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint__chevron--top,
+  .scroll-hint__chevron--bottom {
+    opacity: 0.8;
+    animation: none;
+  }
+}

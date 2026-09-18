@@ -1,0 +1,118 @@
+<!-- ==========================================================================
+     pages/splash/splash.wxml — 启动页
+     --------------------------------------------------------------------------
+     设计稿：W430 × H932（iPhone 15 Pro）
+     结构：LOGO 区 / 主标题区 / 副标题 / 底部滑动提示
+
+     ⚠️ 适配策略（重要）
+     --------------------------------------------------------------------------
+     设计稿为 iPhone 15 Pro（430 × 932），需适配各种机型（如 iPhone 17 Pro Max 440 × 956）。
+     策略：水平方向 + 字号走 vw 等比缩放；垂直方向走 flex 比例分配，
+          保证「LOGO 区 : 标题区 : 提示区」的构图比例在任何屏高下一致。
+
+     ⚠️ 字体说明
+     --------------------------------------------------------------------------
+     字体在 app.wxss 中以 --font-serif 统一定义（宋体降级链，STSong 打头）。
+     注意：小程序 <text> 组件对 page 层 font-family 的继承不稳定，
+          关键文字节点仍显式声明 font-family 以确保命中。
+
+     ⚠️ 状态栏适配
+     --------------------------------------------------------------------------
+     本页为沉浸式全屏（navigationStyle: custom），顶部需避开状态栏与胶囊按钮。
+     由 splash.js 计算后注入 CSS 变量 --status-bar-h。
+     ========================================================================== -->
+<view
+  class="splash"
+  style="{{safeAreaStyle}}"
+  bindtouchstart="onTouchStart"
+  bindtouchend="onTouchEnd"
+  bindtap="onTap"
+>
+
+  <!-- ----------------------------------------------------------------------
+       一、背景层
+       ----------------------------------------------------------------------
+       素材：暗色陶瓷器物摄影图（860 × 1864 @2x）
+       路径：/assets/images/splash-bg.png
+       mode="aspectFill" → 铺满全屏并保持比例（cover）
+       ---------------------------------------------------------------------- -->
+  <image
+    class="splash__bg"
+    src="../../assets/images/splash-bg.png"
+    mode="aspectFill"
+    aria-hidden="true"
+  />
+
+  <!-- 深色蒙版：提升文字可读性（分层渐变，见 wxss） -->
+  <view class="splash__mask" aria-hidden="true" />
+
+  <!-- ----------------------------------------------------------------------
+       二、内容层
+       ----------------------------------------------------------------------
+       左右内边距 18px，以下所有元素共用同一条左基准线：
+          LOGO → 陶瓷博物馆 → Ceramics Museum → 传承 → 走进陶瓷博物馆…
+       因此各元素不得添加额外 margin-left / text-indent。
+       ---------------------------------------------------------------------- -->
+  <view class="splash__content">
+
+    <!-- ===== LOGO 区（左上角） ===== -->
+    <view class="brand">
+      <!-- ⚠️ 素材：陶瓷博物馆 LOGO（线描陶瓶图形）
+           实际尺寸：50 × 66 px @2x（竖长形，非正方形）
+           ⚠️ 不可强制为正方形，否则图形会被压扁
+           路径：/assets/icons/logo.png
+           注：此处按「逻辑尺寸 25 × 33」等比缩小展示 -->
+      <image
+        class="brand__logo"
+        src="../../assets/icons/logo.png"
+        mode="aspectFit"
+        aria-label="陶瓷博物馆标志"
+      />
+
+      <text class="brand__name-cn">陶瓷博物馆</text>
+      <text class="brand__name-en">Ceramics Museum</text>
+    </view>
+
+    <!-- ===== 主体文字区 ===== -->
+    <view class="hero">
+
+      <!-- 主标题：四行竖排感 -->
+      <view class="hero__title">
+        <text class="hero__line">传承</text>
+        <text class="hero__line">千年匠心</text>
+        <text class="hero__line hero__line--gap">遇见</text>
+        <!--
+          「非遗之美」双色：
+            「非遗」= 品牌主色 #A57B52
+            「之美」= 反色（白）#FFFFFF
+          ⚠️ 拆为两个嵌套 <text> 分别着色，不要用渐变
+        -->
+        <text class="hero__line"><text class="hero__char--brand">非遗</text><text class="hero__char--light">之美</text></text>
+      </view>
+
+      <!-- 副标题 -->
+      <text class="hero__subtitle">走进陶瓷博物馆，感受文化温度</text>
+
+    </view>
+
+    <!-- ===== 底部滑动提示 ===== -->
+    <view class="scroll-hint">
+      <!-- 向上箭头：用 CSS 绘制，避免额外素材依赖 -->
+      <view class="scroll-hint__arrow" aria-hidden="true">
+        <view class="scroll-hint__chevron scroll-hint__chevron--top">
+          <view class="scroll-hint__line scroll-hint__line--left" />
+          <view class="scroll-hint__line scroll-hint__line--right" />
+        </view>
+        <view class="scroll-hint__chevron scroll-hint__chevron--bottom">
+          <view class="scroll-hint__line scroll-hint__line--left" />
+          <view class="scroll-hint__line scroll-hint__line--right" />
+        </view>
+      </view>
+
+      <text class="scroll-hint__text">向上滑动</text>
+      <text class="scroll-hint__text scroll-hint__text--sub">开启文化之旅</text>
+    </view>
+
+  </view>
+
+</view>

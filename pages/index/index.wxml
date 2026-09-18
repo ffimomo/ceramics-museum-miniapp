@@ -1,0 +1,12 @@
+<!--pages/index/index.wxml — 首页
+  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
+     待 Figma 设计规范接入后，按设计稿填充各区块。
+-->
+<view class="page">
+
+  <!-- 主内容区挂载点 -->
+  <view class="main">
+    <!-- TODO: 首页内容待按设计稿实现 -->
+  </view>
+
+</view>

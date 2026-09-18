@@ -1,0 +1,8 @@
+/* pages/detail/detail.wxss — 详情页样式
+   ⚠️ 空占位，不含界面实现代码。
+*/
+
+.page {
+  /* TODO: 详情页样式待按设计稿实现 */
+  min-height: 100vh;
+}

@@ -1,0 +1,16 @@
+<!--pages/search/search.wxml — 搜索页
+  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
+-->
+<view class="page">
+
+  <!-- 搜索区挂载点 -->
+  <view class="search-bar">
+    <!-- TODO: 搜索框待按设计稿实现 -->
+  </view>
+
+  <!-- 结果区挂载点 -->
+  <view class="main">
+    <!-- TODO: 搜索结果待按设计稿实现 -->
+  </view>
+
+</view>

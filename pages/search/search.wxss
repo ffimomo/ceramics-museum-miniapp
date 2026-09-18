@@ -1,0 +1,12 @@
+/* pages/search/search.wxss — 搜索页样式
+   ⚠️ 空占位，不含界面实现代码。
+*/
+
+.page {
+  /* TODO: 搜索页样式待按设计稿实现 */
+  min-height: 100vh;
+}
+
+.search-bar {
+  /* TODO */
+}

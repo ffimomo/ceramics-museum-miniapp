@@ -1,0 +1,12 @@
+/* pages/mine/mine.wxss — 我的 样式
+   ⚠️ 空占位，不含界面实现代码。
+*/
+
+.page {
+  /* TODO: 个人中心样式待按设计稿实现 */
+  min-height: 100vh;
+}
+
+.profile {
+  /* TODO */
+}

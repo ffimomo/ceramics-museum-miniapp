@@ -1,0 +1,29 @@
+# 忽略规则
+# 说明：小程序原生项目无需 node_modules，此处主要为 Trae / 编辑器的临时文件兜底
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# 依赖（若后续引入 npm 构建）
+node_modules/
+miniprogram_npm/
+
+# 构建产物
+dist/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 微信开发者工具本地缓存
+.wechat/
+
+# 备份文件（手工应急备份，不纳入版本控制）
+*.bak
+
+# tools/ 下脚本的中间输出（下划线前缀）
+tools/_*.txt

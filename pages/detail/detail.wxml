@@ -1,0 +1,11 @@
+<!--pages/detail/detail.wxml — 详情页
+  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
+-->
+<view class="page">
+
+  <!-- 详情内容挂载点 -->
+  <view class="main">
+    <!-- TODO: 详情内容待按设计稿实现 -->
+  </view>
+
+</view>

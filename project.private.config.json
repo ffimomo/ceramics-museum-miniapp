@@ -1,0 +1,26 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "%E9%99%B6%E7%93%B7%E5%8D%9A%E7%89%A9%E9%A6%86",
+  "description": "陶瓷博物馆小程序",
+  "appid": "wx1eeaa19127f2c3ba",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false,
+    "useIsolateContext": true
+  },
+  "condition": {},
+  "libVersion": "3.17.3"
+}

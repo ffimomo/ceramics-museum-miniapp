@@ -1,0 +1,11 @@
+<!--pages/list/list.wxml — 展品列表页
+  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
+-->
+<view class="page">
+
+  <!-- 列表区挂载点 -->
+  <view class="main">
+    <!-- TODO: 列表内容待按设计稿实现 -->
+  </view>
+
+</view>

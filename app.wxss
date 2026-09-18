@@ -1,0 +1,195 @@
+/* ==========================================================================
+   app.wxss — 全局样式
+   --------------------------------------------------------------------------
+   内容：设计变量 + 全局重置 + 通用工具类
+   变量来源：Figma「Collection 1」，命名与分组与之保持一致。
+
+   设计稿基准：iPhone 15 Pro（430 × 932 pt）
+   单位方案：vw（430px 设计稿 = 100vw，即 1px = 0.23256vw）
+   ========================================================================== */
+
+/* ==========================================================================
+   一、设计变量
+   --------------------------------------------------------------------------
+   小程序 WXSS 不支持 SCSS，使用 CSS 自定义属性实现。
+   变量定义在 page 选择器上（小程序中 :root 不可用）。
+   ========================================================================== */
+page {
+  /* ===== 品牌 ===== */
+  --brand-primary: #a57b52; /* 主色 */
+  --brand-secondary: #c8b39b; /* 辅助色 */
+
+  /* ===== 文字 ===== */
+  --text-level-1: #2f2923; /* 一级 */
+  --text-level-2: #7c7368; /* 二级 */
+  --text-inverse: #ffffff; /* 反色 */
+
+  /* ===== 图标 ===== */
+  --icon-primary: #6b5b4a; /* 主色 */
+  --icon-secondary: #b7aa9a; /* 辅助色 */
+  --icon-inverse: #ffffff; /* 反色 */
+
+  /* ===== 界面 ===== */
+  --bg-default: #f6f3ec; /* 默认底色 */
+  --bg-dark: #1b1714; /* 深色底色 */
+  --bg-white: #ffffff; /* 纯白底色 */
+
+  /* ===== 边框色 ===== */
+  --border-default: #e5ddd3; /* 默认 */
+  --border-thick: #d4c8ba; /* 粗（后续界面会用到） */
+
+  /* ===== 补充色（不在 Figma 变量表内，按设计稿实际需要补充） ===== */
+  --accent-bg: #fce9dc; /* 浅杏底：预约页「个人/团队/志愿者」选项卡 */
+
+  /* ===== 字体 ===== */
+  /*
+   * ⚠️ 本项目的英文同样使用宋体，与中文保持一致（设计稿要求），
+   *    因此英文文字也必须走 --font-serif，不要落到无衬线字体。
+   *
+   * 【链首】'CeramicsSerif' —— 自定义加载的「思源宋体子集」
+   *   由 app.js 的 wx.loadFontFace() 注册，全平台统一。
+   *   ⚠️ 该名称必须与 app.js 中 FONT_FAMILY 完全一致，否则不生效。
+   *
+   * 【降级链】若自定义字体加载失败（网络/基础库限制），依次回退：
+   *   STSong（iOS 华文宋体）> Songti SC（iOS 宋体）
+   *   > STZhongsong（iOS 华文中宋）> SimSun（Windows 宋体）
+   *   > serif（系统衬线兜底）
+   *
+   * ⚠️ 实测教训：
+   *   仅靠系统字体名（STSong 等）在 iPhone 真机 <text> 上未命中，
+   *   会落到系统无衬线体（黑体）。因此必须以「字体文件加载」为主方案。
+   */
+  --font-serif: 'CeramicsSerif', 'STSong', 'Songti SC', 'STZhongsong',
+    'Source Han Serif SC', 'Noto Serif SC', 'Songti TC', 'SimSun',
+    'Times New Roman', Georgia, serif;
+
+  /* 无衬线字体：本项目中仅用于极小字号的辅助信息 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  /* 数字字体 */
+  --font-number: 'DIN Alternate', 'SF Pro Display', -apple-system, sans-serif;
+
+  /* ======================================================================
+     页面基础样式
+     ====================================================================== */
+  box-sizing: border-box;
+  background-color: var(--bg-default);
+  color: var(--text-level-1);
+  font-family: var(--font-serif);
+  font-size: calc(14 / 430 * 100vw);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   二、全局重置
+   ========================================================================== */
+view,
+text,
+image,
+scroll-view,
+swiper,
+swiper-item,
+button,
+input,
+textarea,
+navigator,
+form,
+label {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+image {
+  display: block;
+}
+
+/* 去掉 button 默认样式干扰 */
+button {
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+button::after {
+  border: none;
+}
+
+/* ==========================================================================
+   三、通用工具类
+   ========================================================================== */
+
+/* --- 文本截断 --- */
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.text-clamp-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.text-clamp-3 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+/* --- 弹性布局 --- */
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- 1px 细线（解决高分屏 1px 过粗） --- */
+.hairline-bottom {
+  position: relative;
+}
+
+.hairline-bottom::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background-color: var(--border-default);
+  transform: scaleY(0.5);
+  transform-origin: 0 100%;
+}
+
+/* --- 内容容器（页面左右安全边距） --- */
+.container {
+  width: 100%;
+  padding-right: calc(16 / 430 * 100vw);
+  padding-left: calc(16 / 430 * 100vw);
+}

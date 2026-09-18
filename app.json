@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/splash/splash",
+    "pages/index/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#f6f3ec",
+    "navigationBarTitleText": "陶瓷博物馆",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f6f3ec"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

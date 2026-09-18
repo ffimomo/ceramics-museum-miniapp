@@ -1,0 +1,8 @@
+/* pages/list/list.wxss — 展品列表页样式
+   ⚠️ 空占位，不含界面实现代码。
+*/
+
+.page {
+  /* TODO: 列表页样式待按设计稿实现 */
+  min-height: 100vh;
+}
