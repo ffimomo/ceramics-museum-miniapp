@@ -5,12 +5,12 @@
  *
  * ⚠️ 图片资源说明
  *   所有图片路径集中在 data 里（bgImage / logoImage / iconPhone / iconLock /
- *   eyeIcon / iconWechat / iconQQ），默认留空（''）。
- *   填图时只需把对应字段改成图片路径即可，无需改 WXML。
- *   例如：bgImage: '/assets/images/login-bg.png'
+ *   eyeIcon / iconWechat / iconQQ）。
+ *   换图时只需改对应字段的路径，无需改 WXML。
+ *   背景图已转 WebP（原 PNG 560.8KB -> 21.0KB，原图备份在 assets/_originals_png/）。
  *
  * ⚠️ 接口说明
- *   登录接口待后端提供，当前 login() 中已留出请求位置（带 TODO 注释），
+ *   登录接口待后端提供，当前 doLogin() 中已留出请求位置（带 TODO 注释），
  *   现在走的是「本地模拟」分支，方便你先把交互跑通。
  */
 
@@ -27,8 +27,10 @@ Page({
        ----------------------------------------------------------------------
        ⚠️ 修改图片只需改这里，不用动 WXML
        ====================================================================== */
-    /** 背景图：米黄宣纸 / 陶瓷质感 */
-    bgImage: '/assets/images/login-bg.png',
+    /** 背景图：米黄宣纸 / 陶瓷质感
+     *  ⚠️ 已转为 WebP（原 PNG 560.8KB -> WebP 21.0KB，省 96.3%，PSNR 41.6dB）
+     *     原图备份在 assets/_originals_png/ */
+    bgImage: '/assets/images/login-bg.webp',
     /** 品牌 Logo：花瓶线稿 */
     logoImage: '/assets/icons/login-logo.png',
     /** 手机号输入框左侧 icon：书签样式 */
@@ -41,10 +43,12 @@ Page({
      */
     eyeIcon: '/assets/icons/icon-eye.png',
     /** 眼睛图标（明文状态，即「当前已显示密码」）
-     *  ⚠️ 等有「睁眼」专用素材后可改为 '/assets/icons/icon-eye-open.png' */
+     *  ⚠️ 目前与 eyeIconClose 共用同一张图。
+     *     等你补一张「睁眼」专用图后，把这里指向新文件即可（如 icon-eye-open）。
+     *     随后可删除 wxss 中 .field__eye-icon--off 的降透明度规则。 */
     eyeIconOpen: '/assets/icons/icon-eye.png',
     /** 眼睛图标（密文状态，即「当前已隐藏密码」）
-     *  ⚠️ 等有「闭眼」专用素材后可改为 '/assets/icons/icon-eye-close.png' */
+     *  ⚠️ 同上，目前与 eyeIconOpen 共用一张图，靠 --off 类做视觉区分。 */
     eyeIconClose: '/assets/icons/icon-eye.png',
     /** 微信登录 icon */
     iconWechat: '/assets/icons/icon-wechat.png',

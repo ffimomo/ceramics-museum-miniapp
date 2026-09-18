@@ -299,10 +299,9 @@
  *    目前素材只有一张睁眼图，故用降透明度 + 轻微缩小做视觉区分，
  *    让用户能看出当前处于哪种状态。
  *
- *    等你补上「闭眼」图后，只需在 login.js 的 data 里设置：
- *      eyeIconOpen:  '/assets/icons/icon-eye-open.png',
- *      eyeIconClose: '/assets/icons/icon-eye-close.png',
- *    然后删掉下面 .field__eye-icon--off 这条规则即可。
+ *    等你补上「闭眼」专用图后：
+ *      1. 把 login.js 的 data.eyeIconClose 指向新图（data.eyeIconOpen 同理）
+ *      2. 删掉下面 .field__eye-icon--off 这条规则
  */
 .field__eye-icon--off {
   opacity: 0.42;

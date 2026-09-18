@@ -33,12 +33,14 @@
        一、背景层
        ----------------------------------------------------------------------
        素材：暗色陶瓷器物摄影图（860 × 1864 @2x）
-       路径：/assets/images/splash-bg.png
+       路径：/assets/images/splash-bg.webp
+             ⚠️ 已由 PNG 转 WebP（943.9KB -> 51.7KB，省 94.5%，PSNR 45.2dB）
+                原图备份在 assets/_originals_png/splash-bg.png
        mode="aspectFill" → 铺满全屏并保持比例（cover）
        ---------------------------------------------------------------------- -->
   <image
     class="splash__bg"
-    src="../../assets/images/splash-bg.png"
+    src="../../assets/images/splash-bg.webp"
     mode="aspectFill"
     aria-hidden="true"
   />

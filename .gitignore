@@ -27,3 +27,9 @@ npm-debug.log*
 
 # tools/ 下脚本的中间输出（下划线前缀）
 tools/_*.txt
+
+# 原始 PNG 备份（已转 WebP 的源图，仅本地留存，不入库、不进包）
+# ⚠️ 注意：assets/_originals_png/ 以 _ 开头，
+#    微信开发者工具默认会打包整个 assets 目录，
+#    如需彻底排除需在 project.config.json 里配置 packOptions.ignore
+assets/_originals_png/

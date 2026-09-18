@@ -9,6 +9,26 @@
       {
         "value": "tools",
         "type": "folder"
+      },
+      {
+        "value": "assets/_originals_png",
+        "type": "folder"
+      },
+      {
+        "value": ".gitignore",
+        "type": "file"
+      },
+      {
+        "value": ".gitattributes",
+        "type": "file"
+      },
+      {
+        "value": ".editorconfig",
+        "type": "file"
+      },
+      {
+        "value": "README.md",
+        "type": "file"
       }
     ],
     "include": []
