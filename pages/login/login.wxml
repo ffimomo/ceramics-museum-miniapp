@@ -140,9 +140,11 @@
       <view class="form__row">
         <view class="remember" bindtap="toggleRemember">
           <!-- ⚠️ 圆形勾选框：设计稿为圆形空心圈，勾选后填充
+               对勾由 CSS 绘制（.remember__tick 的两条边框旋转而成），
+               不用字符 —— 思源宋体子集不含 U+2713，用字符会落到兜底字体。
                如需换成图片 icon，把下面 view 替换为 image 即可 -->
           <view class="remember__box {{rememberPwd ? 'remember__box--checked' : ''}}">
-            <text wx:if="{{rememberPwd}}" class="remember__tick">✓</text>
+            <view wx:if="{{rememberPwd}}" class="remember__tick" />
           </view>
           <text class="remember__label">记住密码</text>
         </view>

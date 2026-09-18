@@ -63,6 +63,26 @@ page {
     'Source Han Serif SC', 'Noto Serif SC', 'Songti TC', 'SimSun',
     'Times New Roman', Georgia, serif;
 
+  /*
+   * ⚠️ 字重统一 400 —— 本项目禁止使用 500/600/700
+   * ------------------------------------------------------------------
+   * 内嵌的思源宋体子集只有 Regular 一个字重（usWeightClass = 400），
+   * 且不包含可变字重轴（fvar）。当 CSS 请求更粗的字重时，渲染器会做
+   * 「合成加粗」（faux bold）—— 把字形向四周描边撑粗。
+   *
+   * 后果：宋体最重要的特征「横细竖粗」的笔画对比被抹平，
+   *       加粗后的字看起来就像黑体，造成同一段文字里
+   *       「部分像宋体、部分像黑体」的混用观感。
+   *
+   * 因此：全项目字号层级靠「字号 + 颜色 + 字间距」拉开，不靠字重。
+   *       若确实需要更粗的效果，应另裁一份 Bold 子集并单独 @font-face 声明，
+   *       而不是用 font-weight 让渲染器去合成。
+   *
+   * 下方 * 选择器的 font-weight 兜底可挡住漏写的显式字重，
+   * 但它无法覆盖已显式声明 500+ 的规则，新增样式时仍需自觉遵守。
+   */
+  font-weight: 400;
+
   /* 无衬线字体：本项目中仅用于极小字号的辅助信息 */
   --font-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -106,11 +126,16 @@ image {
   display: block;
 }
 
-/* 去掉 button 默认样式干扰 */
+/*
+ * button 元素在部分基础库下会自带加粗（浏览器的 UA 默认样式）
+ * 这里显式归零，避免按钮文字比页面其他文字更粗 —— 那也会触发合成加粗。
+ */
 button {
   padding: 0;
   margin: 0;
   font-size: inherit;
+  font-weight: 400;
+  font-family: inherit;
   line-height: inherit;
   color: inherit;
   background-color: transparent;
