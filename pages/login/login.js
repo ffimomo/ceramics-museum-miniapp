@@ -4,7 +4,7 @@
  * 职责：手机号 / 密码输入、密码明暗文切换、记住密码、登录提交、跳转注册与忘记密码
  *
  * ⚠️ 图片资源说明
- *   所有图片路径集中在 data 里（bgImage / logoImage / iconPhone / iconLock /
+ *   所有图片路径集中在 data 里（bgImage / logoImage / iconBookmark / iconLock /
  *   eyeIcon / iconWechat / iconQQ）。
  *   换图时只需改对应字段的路径，无需改 WXML。
  *   背景图已转 WebP（原 PNG 560.8KB -> 21.0KB，原图备份在 assets/_originals_png/）。
@@ -33,8 +33,8 @@ Page({
     bgImage: '/assets/images/login-bg.webp',
     /** 品牌 Logo：花瓶线稿 */
     logoImage: '/assets/icons/login-logo.png',
-    /** 手机号输入框左侧 icon：书签样式 */
-    iconPhone: '/assets/icons/icon-phone.png',
+    /** 手机号输入框左侧 icon：书签样式（Bookmark） */
+    iconBookmark: '/assets/icons/icon-bookmark.png',
     /** 密码输入框左侧 icon：锁 */
     iconLock: '/assets/icons/icon-lock.png',
     /**

@@ -59,11 +59,11 @@
            手机号输入框
            ------------------------------------------------------------------ -->
       <view class="field {{phoneFocus ? 'field--focus' : ''}}">
-        <!-- 左侧书签 icon
-             ⚠️ 换图改 login.js 的 data.iconPhone 即可 -->
+        <!-- 左侧书签 icon（Bookmark）
+             ⚠️ 换图改 login.js 的 data.iconBookmark 即可 -->
         <image
           class="field__icon"
-          src="{{iconPhone}}"
+          src="{{iconBookmark}}"
           mode="aspectFit"
           aria-hidden="true"
         />
