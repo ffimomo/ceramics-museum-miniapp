@@ -30,34 +30,34 @@ Page({
     /** 背景图：米黄宣纸 / 陶瓷质感
      *  ⚠️ 已转为 WebP（原 PNG 560.8KB -> WebP 21.0KB，省 96.3%，PSNR 41.6dB）
      *     原图备份在 assets/_originals_png/ */
-    bgImage: '/assets/images/login-bg.webp',
+    bgImage: '../../assets/images/login-bg.webp',
     /** 品牌 Logo：花瓶线稿 */
-    logoImage: '/assets/icons/login-logo.png',
+    logoImage: '../../assets/icons/login-logo.png',
     /** 手机号输入框左侧 icon：书签样式（Bookmark） */
-    iconBookmark: '/assets/icons/icon-bookmark.png',
+    iconBookmark: '../../assets/icons/icon-bookmark.png',
     /** 密码输入框左侧 icon：锁 */
-    iconLock: '/assets/icons/icon-lock.png',
+    iconLock: '../../assets/icons/icon-lock.png',
     /**
      * 密码框右侧眼睛 icon：跟随 showPassword 自动切换
      * 初始 showPassword = false（密文态），故取「闭眼」图
      */
-    eyeIcon: '/assets/icons/icon-eye-close.png',
+    eyeIcon: '../../assets/icons/icon-eye-close.png',
     /**
      * 眼睛图标（睁眼）：showPassword = true 时使用 ——
      * 语义为「密码当前是明文，点它可隐藏」。
      * 两张图同源同色（RGB 183,170,154 = --icon-secondary #B7AA9A），
      * 按同一尺寸渲染时视觉重心一致（差 0.26px），切换不跳动。
      */
-    eyeIconOpen: '/assets/icons/icon-eye.png',
+    eyeIconOpen: '../../assets/icons/icon-eye.png',
     /**
      * 眼睛图标（闭眼）：showPassword = false 时使用 ——
      * 语义为「密码当前是密文，点它可显示」。
      */
-    eyeIconClose: '/assets/icons/icon-eye-close.png',
+    eyeIconClose: '../../assets/icons/icon-eye-close.png',
     /** 微信登录 icon */
-    iconWechat: '/assets/icons/icon-wechat.png',
+    iconWechat: '../../assets/icons/icon-wechat.png',
     /** QQ 登录 icon */
-    iconQQ: '/assets/icons/icon-qq.png',
+    iconQQ: '../../assets/icons/icon-qq.png',
 
     /* ======================================================================
        表单数据

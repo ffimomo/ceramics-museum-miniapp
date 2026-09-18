@@ -20,16 +20,21 @@
        ⚠️ 换图改 login.js 的 data.bgImage 即可
 
        叠放顺序（由下到上）：
-         1. .login 根容器        backgroundColor 兜底底色（z-index auto）
+         1. .login__bg-fallback  兜底色（宣纸质感渐变），z-index 0
          2. .login__bg           背景照片，z-index 1
          3. .login__content      页面内容，z-index 2
 
-       底色兜底由 .login 根容器的 background-color 承担，不再单独设节点。
+       ⚠️ 兜底层必须在照片【下方】。它的 background-color 是不透明的，
+          一旦 z-index 高于照片，就会把照片整屏盖住（「真机背景不见了」的根因）。
+          它的作用仅为：图片加载中/加载失败时兜住页面，不让露白。
 
-       ⚠️ 路径必须用【正斜杠 /】。写成 assets\images\x.webp 时，
-          WXML 会把 \\ 当转义符吃掉，路径塌成 assetsimagesx.webp，
-          真机报 500 无法加载图片。素材统一走 js 变量绑定，避免手写路径。
+       ⚠️ 路径必须用【正斜杠 /】。写成 ..\..\assets\x.webp 时，
+          WXML 会把 \ 当转义符吃掉（\i、\l 均非合法转义序列），
+          路径塌成 ....assetsx.webp，真机报 500 无法加载图片。
+          写法对齐 splash 页：../../assets/images/xxx.webp
        ======================================================================== -->
+  <view class="login__bg-fallback" aria-hidden="true" />
+
   <image
     class="login__bg"
     src="{{bgImage}}"
