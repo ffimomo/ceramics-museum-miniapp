@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/splash/splash",
+    "pages/login/login",
     "pages/index/index"
   ],
   "window": {

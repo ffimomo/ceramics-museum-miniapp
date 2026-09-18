@@ -122,7 +122,7 @@
   /*
    * flex 比例：LOGO 区占比较小（设计稿中 LOGO 紧凑贴顶，不占大块空间）
    */
-  flex: 1.6;
+  flex: 1.8;
   flex-direction: column;
   /*
    * ⚠️ 关键：LOGO 区顶部对齐，不用 center —— 设计稿中 LOGO 紧贴状态栏下方。
@@ -134,7 +134,7 @@
   align-items: center;
   /* 顶部留白：紧贴状态栏下方，仅留一点呼吸空间
      （状态栏/胶囊高度由 JS 注入 --status-bar-h） */
-  padding-top: calc(var(--status-bar-h, 44) + 4px);
+  padding-top: calc(var(--status-bar-h, 44) - 4px);
   min-height: 0;
 }
 
@@ -150,9 +150,9 @@
  */
 .brand__logo {
   display: block;
-  width: calc(25 / 430 * 100vw);
-  height: calc(33 / 430 * 100vw);
-  margin: 0 0 calc(6 / 430 * 100vw) 0;
+  width: calc(23 / 430 * 100vw);
+  height: calc(30 / 430 * 100vw);
+  margin: 0 0 calc(5 / 430 * 100vw) 0;
   /* 确保与下方文字块左边缘严格齐平 */
   margin-left: 0;
 }
@@ -161,7 +161,7 @@
   display: block;
   /* 中文名称：17px，宋体，字距略开 */
   font-family: var(--font-serif);
-  font-size: calc(17 / 430 * 100vw);
+  font-size: calc(15 / 430 * 100vw);
   font-weight: 500;
   line-height: 1.4;
   color: var(--text-inverse);
@@ -177,7 +177,7 @@
    */
   display: block;
   font-family: var(--font-serif);
-  font-size: calc(11 / 430 * 100vw);
+  font-size: calc(10 / 430 * 100vw);
   font-weight: 400;
   line-height: 1.5;
   color: var(--text-inverse);
@@ -195,7 +195,7 @@
    * 标题区占最大比例，内容垂直居中其内部，
    * 使标题组落在画面中部偏上位置（与设计稿一致）。
    */
-  flex: 4.2;
+  flex: 3.0;
   flex-direction: column;
   justify-content: center;
   min-height: 0;
@@ -205,6 +205,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-left: calc(13 / 430 * 100vw); 
 }
 
 .hero__line {
@@ -258,6 +259,7 @@
   letter-spacing: 0.05em;
   opacity: 0.92;
   margin-top: calc(20 / 430 * 100vw);
+  margin-left: calc(13 / 430 * 100vw); 
 }
 
 /* ==========================================================================

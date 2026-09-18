@@ -1,0 +1,523 @@
+/* ==========================================================================
+   pages/login/login.wxss — 登录页样式
+   --------------------------------------------------------------------------
+   设计稿：W430 × H932（iPhone 15 Pro）
+   单位方案：与启动页统一 —— vw 等比缩放
+             calc(N / 430 * 100vw)，其中 N 为设计稿 mm 标注的 px 值
+
+   ⚠️ 布局策略（与启动页一致的「双轨制」）
+   --------------------------------------------------------------------------
+   水平方向 + 字号  → vw 等比缩放（任何机型宽度下比例一致）
+   垂直方向构图     → flex 比例分配（任何屏高下构图稳定，不漂移）
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面根容器
+   ========================================================================== */
+.login {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f2ece1; /* 米黄宣纸兜底色，与设计稿背景基调一致 */
+}
+
+/* ==========================================================================
+   二、背景层
+   ========================================================================== */
+.login__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  /* ⚠️ 素材未填时 src 为空，小程序不会渲染出可见内容，
+       下面的 .login__bg-fallback 会兜底呈现米黄宣纸质感 */
+}
+
+/*
+ * 背景兜底：宣纸/陶瓷质感
+ * --------------------------------------------------------------------------
+ * 用多层 radial-gradient 模拟纸张的斑驳纹理与柔和明暗，
+ * 叠加一个极浅的暖色 linear-gradient 作为基调。
+ * 图片填好后，这一层可以保留（作为图片下方的底色）或删除。
+ */
+.login__bg-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  /* 底层：米黄暖调渐变 */
+  background-color: #f5f0e6;
+  background-image:
+    /* 左上角柔和暖光 */
+    radial-gradient(
+      ellipse 70% 50% at 18% 8%,
+      rgba(255, 253, 246, 0.95) 0%,
+      rgba(255, 253, 246, 0) 60%
+    ),
+    /* 右侧中部略深的宣纸纹理斑驳 */
+    radial-gradient(
+      ellipse 55% 38% at 92% 42%,
+      rgba(213, 196, 170, 0.5) 0%,
+      rgba(213, 196, 170, 0) 70%
+    ),
+    /* 左下角淡淡的阴影层次 */
+    radial-gradient(
+      ellipse 60% 45% at 8% 88%,
+      rgba(206, 188, 162, 0.42) 0%,
+      rgba(206, 188, 162, 0) 68%
+    ),
+    /* 中部微弱的竖向纤维感 */
+    linear-gradient(
+      180deg,
+      rgba(248, 243, 234, 0.6) 0%,
+      rgba(240, 232, 218, 0.35) 45%,
+      rgba(246, 240, 229, 0.6) 100%
+    );
+}
+
+/* ==========================================================================
+   三、内容层（三段式纵向布局）
+   --------------------------------------------------------------------------
+   品牌区（顶部） : 表单区（中部，占比最大） : 第三方区（底部）
+   用 flex 比例分配保证不同屏高下构图稳定
+   ========================================================================== */
+.login__content {
+  position: relative;
+  z-index: 2; /* 压在两层背景之上 */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  /* 左右安全边距：设计稿内容区左右各 65px（430 宽下） */
+  padding-right: calc(28 / 430 * 100vw);
+  padding-left: calc(28 / 430 * 100vw);
+  /* 顶部避开状态栏 */
+  padding-top: calc(var(--status-bar-h, 44) + 20px);
+  /* 底部避开 Home Indicator */
+  padding-bottom: calc(16 / 430 * 100vw);
+  padding-bottom: calc(16 / 430 * 100vw + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   四、品牌区（Logo + 馆名）
+   ========================================================================== */
+.brand {
+  display: flex;
+  flex: 0 0 auto; /* 不参与 flex 分配，高度由内容决定 */
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  /* 与下方表单区之间的间距 */
+  margin-bottom: calc(74 / 430 * 100vw);
+}
+
+/*
+ * Logo
+ * --------------------------------------------------------------------------
+ * 设计稿：花瓶线稿约 108 × 130 px（@2x），逻辑约 54 × 65
+ * ⚠️ 素材为竖长形，宽高比保持 54 : 65，不要强行改成正方形
+ */
+.brand__logo {
+  display: block;
+  width: calc(62 / 430 * 100vw);
+  height: calc(75 / 430 * 100vw);
+  /* 没有图时隐藏，避免出现破图占位 */
+  opacity: 1;
+}
+
+/*
+ * Logo 占位框（素材未填时可见）
+ * ⚠️ 图片填好后请删除 WXML 里的 .brand__logo-placeholder 节点，
+ *    或保留也无妨（它绝对定位在 Logo 位置，会被图片覆盖）
+ */
+.brand__logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(62 / 430 * 100vw);
+  height: calc(75 / 430 * 100vw);
+  /* 与图片同位叠加 */
+  margin-top: calc(-75 / 430 * 100vw);
+  border: 1px dashed rgba(122, 98, 74, 0.35);
+  border-radius: calc(6 / 430 * 100vw);
+}
+
+.brand__logo-placeholder-text {
+  font-family: var(--font-sans);
+  font-size: calc(10 / 430 * 100vw);
+  color: rgba(122, 98, 74, 0.55);
+  letter-spacing: 0.08em;
+}
+
+/* 中文馆名：设计稿约 24px，宋体，深棕色 */
+.brand__name-cn {
+  display: block;
+  margin-top: calc(14 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(24 / 430 * 100vw);
+  font-weight: 500;
+  line-height: 1.3;
+  color: #3d332a;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* 英文馆名：设计稿约 15px，同样宋体（项目约定：英文也走 serif） */
+.brand__name-en {
+  display: block;
+  margin-top: calc(2 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(15 / 430 * 100vw);
+  font-weight: 400;
+  line-height: 1.4;
+  color: #3d332a;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* ==========================================================================
+   五、登录表单区
+   ========================================================================== */
+.form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 标题「欢迎登陆」：设计稿约 30px，宋体，深色 */
+.form__title {
+  display: block;
+  margin-bottom: calc(30 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(30 / 430 * 100vw);
+  font-weight: 500;
+  line-height: 1.3;
+  color: #2f2923;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+   输入框（手机号 / 密码 共用）
+   --------------------------------------------------------------------------
+   设计稿：浅色描边胶囊圆角矩形，高度约 62px，圆角约 10px
+   -------------------------------------------------------------------------- */
+.field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: calc(62 / 430 * 100vw);
+  margin-bottom: calc(20 / 430 * 100vw);
+  padding: 0 calc(18 / 430 * 100vw);
+  border: 1px solid rgba(168, 148, 122, 0.55);
+  border-radius: calc(10 / 430 * 100vw);
+  background-color: rgba(255, 253, 248, 0.55);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* 聚焦态：描边变深、底色更亮 */
+.field--focus {
+  border-color: var(--brand-primary);
+  background-color: rgba(255, 253, 248, 0.82);
+}
+
+/* 左侧 icon */
+.field__icon {
+  flex-shrink: 0;
+  width: calc(20 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+}
+
+/*
+ * icon 与输入区之间的竖分隔线（设计稿中有这条细线）
+ * --------------------------------------------------------------------------
+ * 高度约为输入框的一半，颜色浅于边框
+ */
+.field__sep {
+  flex-shrink: 0;
+  width: 1px;
+  height: calc(26 / 430 * 100vw);
+  margin-left: calc(12 / 430 * 100vw);
+  background-color: rgba(168, 148, 122, 0.42);
+}
+
+/* icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
+.field__icon-placeholder {
+  flex-shrink: 0;
+  width: calc(20 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  border: 1px dashed rgba(122, 98, 74, 0.35);
+  border-radius: calc(4 / 430 * 100vw);
+}
+
+.field__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 calc(14 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(17 / 430 * 100vw);
+  color: #2f2923;
+}
+
+.field__placeholder {
+  font-family: var(--font-serif);
+  font-size: calc(17 / 430 * 100vw);
+  color: rgba(122, 106, 88, 0.62);
+}
+
+/* 右侧眼睛按钮 */
+.field__eye {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: calc(34 / 430 * 100vw);
+  height: calc(34 / 430 * 100vw);
+  margin-left: calc(6 / 430 * 100vw);
+}
+
+.field__eye--hover {
+  opacity: 0.6;
+}
+
+.field__eye-icon {
+  width: calc(22 / 430 * 100vw);
+  height: calc(22 / 430 * 100vw);
+}
+
+/* 眼睛 icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
+.field__eye-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(22 / 430 * 100vw);
+  height: calc(22 / 430 * 100vw);
+  margin-top: calc(-22 / 430 * 100vw);
+  border: 1px dashed rgba(122, 98, 74, 0.3);
+  border-radius: 50%;
+}
+
+.field__eye-placeholder-text {
+  font-size: calc(11 / 430 * 100vw);
+  line-height: 1;
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   记住密码 / 忘记密码 一行
+   -------------------------------------------------------------------------- */
+.form__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: calc(4 / 430 * 100vw);
+  margin-bottom: calc(38 / 430 * 100vw);
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+}
+
+/* 圆形勾选框：设计稿为圆形空心圈 */
+.remember__box {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: calc(20 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  border: 1px solid rgba(168, 148, 122, 0.75);
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+/* 勾选态：填充品牌色 */
+.remember__box--checked {
+  border-color: var(--brand-primary);
+  background-color: var(--brand-primary);
+}
+
+.remember__tick {
+  font-family: var(--font-sans);
+  font-size: calc(12 / 430 * 100vw);
+  line-height: 1;
+  color: var(--text-inverse);
+}
+
+.remember__label {
+  margin-left: calc(9 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(16 / 430 * 100vw);
+  color: #3d332a;
+  letter-spacing: 0.02em;
+}
+
+/* 忘记密码链接 */
+.form__forget {
+  font-family: var(--font-serif);
+  font-size: calc(16 / 430 * 100vw);
+  color: var(--brand-primary);
+  letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   登录按钮
+   --------------------------------------------------------------------------
+   设计稿：棕色实心、白色文字、圆角约 10px、宽约 90% 居中
+   -------------------------------------------------------------------------- */
+.btn-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(62 / 430 * 100vw);
+  margin: 0 auto;
+  border-radius: calc(10 / 430 * 100vw);
+  background-color: transparent; /* 实际色在下面覆盖 */
+  font-family: var(--font-serif);
+  font-size: calc(21 / 430 * 100vw);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-inverse);
+  letter-spacing: 0.08em;
+  /* 去掉原生 button 的默认边框 */
+  border: none;
+  /* 主色背景 */
+  background-color: #a87c52;
+}
+
+.btn-login--hover {
+  opacity: 0.88;
+}
+
+.btn-login[disabled] {
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   注册引导
+   -------------------------------------------------------------------------- */
+.form__register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: calc(20 / 430 * 100vw);
+}
+
+.form__register-label {
+  font-family: var(--font-serif);
+  font-size: calc(15 / 430 * 100vw);
+  color: #6f6355;
+  letter-spacing: 0.02em;
+}
+
+/* 「去注册」棕色文字链接 */
+.form__register-link {
+  margin-left: calc(8 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(15 / 430 * 100vw);
+  font-weight: 500;
+  color: var(--brand-primary);
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   六、第三方登录区
+   ========================================================================== */
+.third {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  /* 推到底部 */
+  margin-top: auto;
+  padding-bottom: calc(24 / 430 * 100vw);
+}
+
+/* 分割线 + 居中标题 */
+.third__divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.third__line {
+  flex: 1;
+  min-width: 0;
+  height: 1px;
+  background-color: rgba(168, 148, 122, 0.42);
+}
+
+.third__title {
+  flex-shrink: 0;
+  padding: 0 calc(14 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(15 / 430 * 100vw);
+  color: #7b6e5e;
+  letter-spacing: 0.04em;
+}
+
+/* 两个圆形按钮 */
+.third__btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: calc(26 / 430 * 100vw);
+  /* 两个按钮之间的间距 */
+  column-gap: calc(44 / 430 * 100vw);
+}
+
+.third__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(56 / 430 * 100vw);
+  height: calc(56 / 430 * 100vw);
+  border: 1px solid rgba(168, 148, 122, 0.48);
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.18s ease;
+}
+
+.third__btn--hover {
+  background-color: rgba(168, 148, 122, 0.12);
+}
+
+.third__btn-icon {
+  width: calc(28 / 430 * 100vw);
+  height: calc(28 / 430 * 100vw);
+}
+
+/* icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
+.third__btn-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(28 / 430 * 100vw);
+  height: calc(28 / 430 * 100vw);
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(122, 98, 74, 0.32);
+  border-radius: calc(4 / 430 * 100vw);
+}
+
+.third__btn-placeholder-text {
+  font-family: var(--font-sans);
+  font-size: calc(9 / 430 * 100vw);
+  color: rgba(122, 98, 74, 0.6);
+  letter-spacing: 0;
+}

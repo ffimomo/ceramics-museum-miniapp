@@ -1,0 +1,244 @@
+<!-- ==========================================================================
+     pages/login/login.wxml — 登录页
+     --------------------------------------------------------------------------
+     设计稿：W430 × H932（iPhone 15 Pro），与启动页同一基准
+
+     结构（自上而下）：
+       一、背景层（米黄宣纸质感，留空待填图）
+       二、品牌区（花瓶线稿 Logo + 中英文馆名）
+       三、登录表单区（标题 / 手机号 / 密码 / 记住密码 + 忘记密码 / 登录按钮 / 去注册）
+       四、第三方登录区（分割线 + 微信、QQ 圆形按钮）
+
+     ⚠️ 图片资源全部留空（背景、Logo、两个图标），见文件末尾「素材填写指引」注释。
+     ========================================================================== -->
+<view class="login" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、背景层
+       ------------------------------------------------------------------------
+       ⚠️ 素材位：米黄色宣纸 / 陶瓷质感背景图
+          把 src 改成你的图片路径即可，例如：
+          src="/assets/images/login-bg.png"
+          建议尺寸：860 × 1984 px（@2x），或纯 CSS 渐变兜底（已内置）
+       ======================================================================== -->
+  <image
+    class="login__bg"
+    src="{{bgImage}}"
+    mode="aspectFill"
+    aria-hidden="true"
+  />
+
+  <!-- 背景兜底蒙版：图片未填时也能呈现米黄宣纸质感 -->
+  <view class="login__bg-fallback" aria-hidden="true" />
+
+  <!-- ========================================================================
+       二、内容层
+       ======================================================================== -->
+  <view class="login__content">
+
+    <!-- ===== 品牌区 ===== -->
+    <view class="brand">
+
+      <!-- ⚠️ 素材位：花瓶线稿 Logo
+           src 留空，填图路径例如 "/assets/icons/login-logo.png"
+           设计稿尺寸约 108 × 130 px（@2x → 逻辑 54 × 65） -->
+      <image
+        class="brand__logo"
+        src="{{logoImage}}"
+        mode="aspectFit"
+        aria-label="陶瓷博物馆标志"
+      />
+      <!-- 图片未填时的占位框（可删除，仅用于预览版式） -->
+      <view class="brand__logo-placeholder" aria-hidden="true">
+        <text class="brand__logo-placeholder-text">LOGO</text>
+      </view>
+
+      <text class="brand__name-cn">陶瓷博物馆</text>
+      <text class="brand__name-en">Ceramics Museum</text>
+    </view>
+
+    <!-- ===== 登录表单区 ===== -->
+    <view class="form">
+
+      <!-- 标题：⚠️ 「欢迎登陆」按设计稿原文；规范写法应为「欢迎登录」 -->
+      <text class="form__title">欢迎登陆</text>
+
+      <!-- ------------------------------------------------------------------
+           手机号输入框
+           ------------------------------------------------------------------ -->
+      <view class="field {{phoneFocus ? 'field--focus' : ''}}">
+        <!-- ⚠️ 素材位：书签样式的 icon（左侧）
+             建议尺寸 36 × 36 px（@2x → 逻辑 18 × 18）
+             填图示例：src="/assets/icons/icon-phone.png" -->
+        <image
+          class="field__icon"
+          src="{{iconPhone}}"
+          mode="aspectFit"
+          aria-hidden="true"
+        />
+        <!-- icon 留空时的占位（可删除） -->
+        <view class="field__icon-placeholder" aria-hidden="true" />
+
+        <!-- icon 与输入区之间的竖分隔线（设计稿中有） -->
+        <view class="field__sep" aria-hidden="true" />
+
+        <input
+          class="field__input"
+          type="number"
+          maxlength="11"
+          value="{{phone}}"
+          placeholder="请输入手机号"
+          placeholder-class="field__placeholder"
+          bindinput="onPhoneInput"
+          bindfocus="onPhoneFocus"
+          bindblur="onPhoneBlur"
+          confirm-type="next"
+        />
+      </view>
+
+      <!-- ------------------------------------------------------------------
+           密码输入框
+           ------------------------------------------------------------------ -->
+      <view class="field {{pwdFocus ? 'field--focus' : ''}}">
+        <!-- ⚠️ 素材位：锁 icon（左侧）
+             建议尺寸 36 × 36 px（@2x → 逻辑 18 × 18）
+             填图示例：src="/assets/icons/icon-lock.png" -->
+        <image
+          class="field__icon"
+          src="{{iconLock}}"
+          mode="aspectFit"
+          aria-hidden="true"
+        />
+        <view class="field__icon-placeholder" aria-hidden="true" />
+
+        <!-- icon 与输入区之间的竖分隔线（设计稿中有） -->
+        <view class="field__sep" aria-hidden="true" />
+
+        <input
+          class="field__input"
+          type="{{showPassword ? 'text' : 'password'}}"
+          value="{{password}}"
+          placeholder="请输入密码"
+          placeholder-class="field__placeholder"
+          bindinput="onPasswordInput"
+          bindfocus="onPwdFocus"
+          bindblur="onPwdBlur"
+          confirm-type="done"
+          bindconfirm="onLogin"
+        />
+
+        <!-- ⚠️ 素材位：眼睛 icon（右侧，明/暗文切换）
+             建议尺寸 40 × 40 px（@2x → 逻辑 20 × 20）
+             ● 显示密码时用 icon-eye-open.png
+             ● 隐藏密码时用 icon-eye-close.png
+
+             ⚠️ 填图方式：不要直接在这里写死文件名，而是回到 login.js 的 data 里
+                设置 eyeIconOpen / eyeIconClose，代码会自动按状态切换：
+                  eyeIconOpen:  '/assets/icons/icon-eye-open.png',
+                  eyeIconClose: '/assets/icons/icon-eye-close.png',
+                然后本节点的 src="{{eyeIcon}}" 就会自动生效。 -->
+        <view
+          class="field__eye"
+          bindtap="togglePassword"
+          hover-class="field__eye--hover"
+          aria-label="切换密码显示"
+        >
+          <image
+            class="field__eye-icon"
+            src="{{eyeIcon}}"
+            mode="aspectFit"
+            aria-hidden="true"
+          />
+          <!-- icon 留空时的占位（可删除） -->
+          <view class="field__eye-placeholder" aria-hidden="true">
+            <text class="field__eye-placeholder-text">👁</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ------------------------------------------------------------------
+           记住密码 / 忘记密码
+           ------------------------------------------------------------------ -->
+      <view class="form__row">
+        <view class="remember" bindtap="toggleRemember">
+          <!-- ⚠️ 圆形勾选框：设计稿为圆形空心圈，勾选后填充
+               如需换成图片 icon，把下面 view 替换为 image 即可 -->
+          <view class="remember__box {{rememberPwd ? 'remember__box--checked' : ''}}">
+            <text wx:if="{{rememberPwd}}" class="remember__tick">✓</text>
+          </view>
+          <text class="remember__label">记住密码</text>
+        </view>
+
+        <text class="form__forget" bindtap="goForgetPassword">忘记密码?</text>
+      </view>
+
+      <!-- ------------------------------------------------------------------
+           登录按钮
+           ------------------------------------------------------------------ -->
+      <button
+        class="btn-login"
+        bindtap="onLogin"
+        hover-class="btn-login--hover"
+        loading="{{logging}}"
+        disabled="{{logging}}"
+      >
+        {{logging ? '登录中...' : '登陆'}}
+      </button>
+
+      <!-- 注册引导 -->
+      <view class="form__register">
+        <text class="form__register-label">还没有注册？</text>
+        <text class="form__register-link" bindtap="goRegister">去注册</text>
+      </view>
+
+    </view>
+
+    <!-- ===== 第三方登录区 ===== -->
+    <view class="third">
+
+      <!-- 分割线 + 居中文字 -->
+      <view class="third__divider">
+        <view class="third__line" />
+        <text class="third__title">其他登陆方式</text>
+        <view class="third__line" />
+      </view>
+
+      <!-- 两个圆形按钮 -->
+      <view class="third__btns">
+
+        <!-- ⚠️ 素材位：微信登录图标（圆形按钮内的 icon）
+             建议尺寸 56 × 56 px（@2x → 逻辑 28 × 28）
+             填图示例：src="/assets/icons/icon-wechat.png" -->
+        <view class="third__btn" bindtap="onWechatLogin" hover-class="third__btn--hover">
+          <image
+            class="third__btn-icon"
+            src="{{iconWechat}}"
+            mode="aspectFit"
+            aria-hidden="true"
+          />
+          <view class="third__btn-placeholder" aria-hidden="true">
+            <text class="third__btn-placeholder-text">微信</text>
+          </view>
+        </view>
+
+        <!-- ⚠️ 素材位：QQ 登录图标
+             建议尺寸 56 × 56 px（@2x → 逻辑 28 × 28）
+             填图示例：src="/assets/icons/icon-qq.png" -->
+        <view class="third__btn" bindtap="onQQLogin" hover-class="third__btn--hover">
+          <image
+            class="third__btn-icon"
+            src="{{iconQQ}}"
+            mode="aspectFit"
+            aria-hidden="true"
+          />
+          <view class="third__btn-placeholder" aria-hidden="true">
+            <text class="third__btn-placeholder-text">QQ</text>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+  </view>
+
+</view>
