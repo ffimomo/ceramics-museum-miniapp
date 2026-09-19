@@ -1,12 +1,160 @@
-<!--pages/index/index.wxml — 首页
-  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
-     待 Figma 设计规范接入后，按设计稿填充各区块。
--->
+<!-- ==========================================================================
+     pages/index/index.wxml — 首页
+     --------------------------------------------------------------------------
+     设计稿：Figma「首页1」（node 7-213），基准 430 × 932（iPhone 15 Pro）
+     结构（自上而下）：
+       一、顶部 Banner（通栏大图）
+       二、内容卡片（圆角上浮，叠于 Banner 底部之上）
+          1. 今日开馆（标题 + 日期）
+          2. 顶部双栏卡片区（票务预约大卡 + 博物馆介绍 / 预约讲解小卡）
+          3. 分割线
+          4. 区块标题「陶瓷文化之旅」（+ 查看更多 ›）
+          5. 四张展览卡片（近期特展 / 陶瓷文物 / 陶瓷历史 / 陶瓷手作）
+       三、底部导航（首页 / 导览 / 鉴赏 / 我的，自定义 TabBar）
+
+     ⚠️ 图片 / 图标（绝对路径，一律正斜杠）：
+       卡片背景  /assets/images/card-*.webp  ← Figma 导出的「整卡背景」，@2x
+       轮播/地图 /img/*.jpg
+       图标      /assets/icons/*.png
+       大图一律 mode="aspectFill"（cover 等比裁切铺满）。
+
+     ⚠️🔴 卡片背景图必须与卡片【等比例】，否则必然错乱：
+         设计稿卡片尺寸 → @2x 源图尺寸
+           票务预约        240×156  →  480×312   (比例 1.538)
+           博物馆介绍/预约讲解 124×74 →  248×148   (比例 1.676)
+           展览卡          378×120  →  756×240   (比例 3.150)
+         aspectFill 遇到比例不符的图（尤其是竖版照片）会放大到填满宽度、
+         再裁掉绝大部分高度，只剩中间一条横带 —— 看起来就是「图片错乱/错配」。
+         换图时务必先确认源图比例与卡片一致。
+     ========================================================================== -->
 <view class="page">
 
-  <!-- 主内容区挂载点 -->
-  <view class="main">
-    <!-- TODO: 首页内容待按设计稿实现 -->
+  <!-- ========================================================================
+       一、顶部 Banner
+       ------------------------------------------------------------------------
+       通栏大图，顶部到边（navigationStyle: custom，原生状态栏叠加其上）。
+       ======================================================================== -->
+  <view class="hero">
+    <image class="hero__img" src="/img/banner.jpg" mode="aspectFill" aria-hidden="true" />
+  </view>
+
+  <!-- ========================================================================
+       二、内容卡片（圆角上浮，叠在 Banner 底部之上）
+       ======================================================================== -->
+  <view class="content-card">
+
+    <!-- 1. 今日开馆 -->
+    <view class="today">
+      <text class="today__title">今日开馆</text>
+      <text class="today__date">06/04</text>
+    </view>
+
+    <!-- 2. 顶部双栏卡片区 -->
+    <view class="grid-top">
+
+      <!-- 2.1 票务预约（大卡：整卡背景图 + 文字） -->
+      <view class="ticket" hover-class="card-hover" bindtap="onCardTap" data-name="票务预约">
+        <image class="ticket__img" src="/assets/images/card-ticket.webp" mode="aspectFill" aria-hidden="true" />
+        <text class="ticket__title">票务预约</text>
+        <text class="ticket__sub">立即购票</text>
+      </view>
+
+      <!-- 2.2 右侧小卡列 -->
+      <view class="grid-top__side">
+
+        <!-- 博物馆介绍 -->
+        <view class="mini-card" hover-class="card-hover" bindtap="onCardTap" data-name="博物馆介绍">
+          <image class="mini-card__img" src="/assets/images/card-intro.webp" mode="aspectFill" aria-hidden="true" />
+          <text class="mini-card__title">博物馆介绍</text>
+          <text class="mini-card__sub">了解更多</text>
+        </view>
+
+        <!-- 预约讲解 -->
+        <view class="mini-card" hover-class="card-hover" bindtap="onCardTap" data-name="预约讲解">
+          <image class="mini-card__img" src="/assets/images/card-guide.webp" mode="aspectFill" aria-hidden="true" />
+          <text class="mini-card__title">预约讲解</text>
+          <text class="mini-card__sub">专属讲解服务</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 分割线 -->
+    <view class="divider" aria-hidden="true" />
+
+    <!-- 4. 区块标题：陶瓷文化之旅 -->
+    <view class="section-head">
+      <text class="section-head__title">陶瓷文化之旅</text>
+      <view class="section-head__more" hover-class="section-head__more--hover" bindtap="onCardTap" data-name="陶瓷文化之旅">
+        <text class="section-head__more-text">查看更多</text>
+        <view class="section-head__chevron" aria-hidden="true" />
+      </view>
+    </view>
+
+    <!-- 5. 展览卡片列表 -->
+
+    <!-- 近期特展（浅底图 → 深色文字） -->
+    <view class="exhibit-card" hover-class="card-hover" bindtap="onCardTap" data-name="近期特展">
+      <image class="exhibit-card__img" src="/assets/images/card-exhibition.webp" mode="aspectFill" aria-hidden="true" />
+      <text class="exhibit-card__title">近期特展</text>
+      <text class="exhibit-card__sub">《纷纷天下》《茫茫南渡》《安居广州》</text>
+    </view>
+
+    <!-- 陶瓷文物（深底图 → 反色文字） -->
+    <view class="exhibit-card exhibit-card--inverse" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷文物">
+      <image class="exhibit-card__img" src="/assets/images/card-relic.webp" mode="aspectFill" aria-hidden="true" />
+      <text class="exhibit-card__title">陶瓷文物</text>
+      <text class="exhibit-card__sub">赏千年非遗文物</text>
+    </view>
+
+    <!-- 陶瓷历史（浅底图 → 深色文字） -->
+    <view class="exhibit-card" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷历史">
+      <image class="exhibit-card__img" src="/assets/images/card-history.webp" mode="aspectFill" aria-hidden="true" />
+      <text class="exhibit-card__title">陶瓷历史</text>
+      <text class="exhibit-card__sub">看陶瓷千年之发展脉络</text>
+    </view>
+
+    <!-- 陶瓷手作（深底图 → 反色文字） -->
+    <view class="exhibit-card exhibit-card--inverse" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷手作">
+      <image class="exhibit-card__img" src="/assets/images/card-craft.webp" mode="aspectFill" aria-hidden="true" />
+      <text class="exhibit-card__title">陶瓷手作</text>
+      <text class="exhibit-card__sub">观陶瓷手作，体验匠心之美</text>
+    </view>
+
+  </view>
+
+  <!-- ========================================================================
+       三、底部导航（自定义 TabBar）
+       ------------------------------------------------------------------------
+       固定底部。首页为当前激活态（深色 icon + 一级文字 + Medium 字重）。
+       ======================================================================== -->
+  <view class="tabbar">
+    <view class="tabbar__list">
+
+      <!-- 首页（激活） -->
+      <view class="tabbar__item tabbar__item--active" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="index">
+        <image class="tabbar__icon" src="/assets/icons/tab-home.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">首页</text>
+      </view>
+
+      <!-- 导览 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="guide">
+        <image class="tabbar__icon" src="/assets/icons/tab-guide.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">导览</text>
+      </view>
+
+      <!-- 鉴赏 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="appreciate">
+        <image class="tabbar__icon" src="/assets/icons/tab-appreciate.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">鉴赏</text>
+      </view>
+
+      <!-- 我的 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="mine">
+        <image class="tabbar__icon" src="/assets/icons/tab-mine.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">我的</text>
+      </view>
+
+    </view>
   </view>
 
 </view>
