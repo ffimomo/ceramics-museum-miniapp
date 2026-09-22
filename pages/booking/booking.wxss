@@ -1,0 +1,300 @@
+/* ==========================================================================
+   pages/booking/booking.wxss — 预约页（票务预约）样式
+   --------------------------------------------------------------------------
+   设计稿基准：430 × 932 pt（iPhone 15 Pro） → 1px = 0.23256vw
+   单位方案：vw（与 app.wxss 约定一致）
+   色值：引用语义令牌（--text-level-1 / --brand-primary / --accent-bg 等）
+
+   结构：一、导航栏 / 二、公告卡片 / 三、Tab / 四、预约选项卡片 / 五、按钮
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面容器
+   ========================================================================== */
+.page {
+  min-height: 100vh;
+  padding-bottom: calc(40 / 430 * 100vw);
+  background-color: var(--bg-default);
+}
+
+/* ==========================================================================
+   二、导航栏（自定义）
+   --------------------------------------------------------------------------
+   顶部由 booking.js 注入 --status-bar-h（状态栏高度），标题/返回键随之下移。
+   ========================================================================== */
+.navbar {
+  padding-top: var(--status-bar-h, 44px);
+}
+
+.navbar__bar {
+  position: relative;
+  height: calc(64 / 430 * 100vw);
+}
+
+/* 返回键：48×48 点击区，内部箭头用内联 SVG（见 .navbar__chevron） */
+.navbar__back {
+  position: absolute;
+  top: 50%;
+  left: calc(12 / 430 * 100vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(48 / 430 * 100vw);
+  height: calc(48 / 430 * 100vw);
+  transform: translateY(-50%);
+}
+
+.navbar__back--hover {
+  opacity: 0.6;
+}
+
+/*
+ * 返回箭头「‹」：内联 SVG
+ * 说明：沿用项目「小图形用 SVG 精确坐标」惯例（见 splash 页 scroll-hint 注释），
+ *       避免 CSS 边框旋转带来的「不对称 / 视觉偏移」缺陷。
+ */
+.navbar__chevron {
+  width: calc(12 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20' fill='none'%3E%3Cpath d='M9 2 L3 10 L9 18' stroke='%232f2923' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.navbar__title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-size: calc(24 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* ==========================================================================
+   三、公告卡片（378 × 320，圆角 20，1px 边框）
+   --------------------------------------------------------------------------
+   文字以绝对定位精确落在设计稿坐标上（相对卡片内边距 28px）。
+   ========================================================================== */
+.notice {
+  position: relative;
+  width: calc(378 / 430 * 100vw);
+  height: calc(320 / 430 * 100vw);
+  margin: calc(12 / 430 * 100vw) auto 0;
+  border: 1px solid var(--border-default);
+  border-radius: calc(20 / 430 * 100vw);
+}
+
+.notice__title {
+  position: absolute;
+  left: calc(28 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* 预约公告 */
+.notice__title--notice {
+  top: calc(36 / 430 * 100vw);
+}
+
+/* 参馆须知 */
+.notice__title--rules {
+  top: calc(155 / 430 * 100vw);
+}
+
+/* 公告正文（14px，自动换行，行高 23px） */
+.notice__body {
+  position: absolute;
+  top: calc(77 / 430 * 100vw);
+  left: calc(28 / 430 * 100vw);
+  right: calc(28 / 430 * 100vw);
+  font-family: var(--font-sans);
+  font-size: calc(14 / 430 * 100vw);
+  line-height: calc(23 / 430 * 100vw);
+  color: var(--text-level-2);
+}
+
+/* 参馆须知列表（4 条） */
+.notice__list {
+  position: absolute;
+  top: calc(196 / 430 * 100vw);
+  left: calc(28 / 430 * 100vw);
+  right: calc(28 / 430 * 100vw);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  font-size: calc(14 / 430 * 100vw);
+  line-height: calc(23 / 430 * 100vw);
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   四、Tab 切换
+   --------------------------------------------------------------------------
+   两个标签等距分布（左右 53px），激活标签下方为品牌主色下划线。
+   ========================================================================== */
+.tabs {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: calc(26 / 430 * 100vw);
+  /*
+   * ⚠️ 这里的左右内边距【有意偏离设计稿】
+   * ------------------------------------------------------------------
+   * 设计稿是 53，两个标签落在 54–139 / 246–375，中间空 106.5，
+   * 而左右外侧各只留 53 —— 中间那一大块显得空。
+   * 按需求改成 72：两个标签各向中间收 19，
+   * 中间空 69（≈ 外侧 72），三段留白基本均衡。
+   */
+  padding-right: calc(72 / 430 * 100vw);
+  padding-left: calc(72 / 430 * 100vw);
+}
+
+.tabs__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tabs__item--hover {
+  opacity: 0.7;
+}
+
+.tabs__label {
+  font-family: var(--font-serif);
+  font-size: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2); /* 未激活：二级文字 */
+}
+
+.tabs__item--active .tabs__label {
+  color: var(--text-level-1); /* 激活：一级文字 */
+}
+
+/* 激活下划线：宽度对齐标签，品牌主色 2px */
+.tabs__underline {
+  width: 100%;
+  height: 2px;
+  margin-top: calc(10 / 430 * 100vw);
+  background-color: var(--brand-primary);
+  border-radius: 1px;
+}
+
+/* ==========================================================================
+   五、预约选项卡片（380 × 80，浅杏底 + 2px 粗边框，圆角 12）
+   --------------------------------------------------------------------------
+   结构：左侧图标（绝对定位）+ 标题 / 副标题（绝对定位）。
+   ========================================================================== */
+.booking-card {
+  position: relative;
+  width: calc(380 / 430 * 100vw);
+  height: calc(80 / 430 * 100vw);
+  margin: calc(18 / 430 * 100vw) auto 0;
+  background-color: var(--accent-bg);
+  border: 2px solid var(--border-thick);
+  border-radius: calc(12 / 430 * 100vw);
+}
+
+.booking-card + .booking-card {
+  margin-top: calc(16 / 430 * 100vw);
+}
+
+/* 图标：个人 / 团队为 PNG，志愿者为内联 SVG 爱心 */
+.booking-card__icon {
+  position: absolute;
+  top: calc(23 / 430 * 100vw);
+  left: calc(25 / 430 * 100vw);
+}
+
+.booking-card__icon--person {
+  width: calc(35 / 430 * 100vw);
+  height: calc(34 / 430 * 100vw);
+}
+
+.booking-card__icon--team {
+  width: calc(45 / 430 * 100vw);
+  height: calc(35 / 430 * 100vw);
+}
+
+/*
+ * 爱心「志愿者」：内联 SVG 描边爱心
+ * --------------------------------------------------------------------------
+ * 设计稿中的 Heart 是设计系统组件、无导出素材，故用 SVG 精确绘制，
+ * 与个人 / 团队图标同为「品牌主色描边」风格。
+ *
+ * ⚠️ 早期画法有两个问题，真机上爱心明显比另外两个图标小一圈：
+ *   1. viewBox 用 24 × 24，而爱心图形只占其中约 13 × 14 —— 四周全是留白，
+ *      配合 background-size: 100% 100%，实际墨迹只有约 11 × 12；
+ *   2. 盒子只给了 20 × 20（个人是 35 × 34、团队是 45 × 35）。
+ *   现在把 viewBox 收紧到图形本身（0 0 31 27.5），盒子也按设计稿实测值给：
+ *      爱心墨迹 31 × 27.5；描边按需求收到 3（设计稿实测约 4，但真机观感偏粗，已下调）
+ */
+.booking-card__heart {
+  /*
+   * 盒子 32 × 28.4 而不是 31 × 27.5：
+   * 描边从 4 收到 3 后，墨迹外扩的部分少了一圈，实测墨迹只有 29 × 26。
+   * 把盒子放大 31/30 抵消掉，墨迹回到约 31 × 26.8，与设计稿的 31 × 27.5 一致。
+   */
+  width: calc(32 / 430 * 100vw);
+  height: calc(28.4 / 430 * 100vw);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 31 27.5' fill='none'%3E%3Cpath d='M15.5 25.6 C15.5 25.6 2 18.2 2 11.1 C2 6.6 5.4 2.6 9 2.6 C11.8 2.6 14 4.8 15.5 7.4 C17 4.8 19.2 2.6 22 2.6 C25.6 2.6 29 6.6 29 11.1 C29 18.2 15.5 25.6 15.5 25.6 Z' stroke='%23a57b52' stroke-width='3' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.booking-card__title {
+  position: absolute;
+  top: calc(16 / 430 * 100vw);
+  left: calc(83 / 430 * 100vw);
+  font-family: var(--font-sans);
+  font-weight: 500; /* 设计稿：PingFang SC Medium */
+  font-size: calc(16 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+.booking-card__sub {
+  position: absolute;
+  top: calc(44 / 430 * 100vw);
+  left: calc(83 / 430 * 100vw);
+  font-family: var(--font-sans);
+  font-size: calc(13 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   六、用户中心按钮（品牌主色 CTA，380 × 60，圆角 15）
+   ========================================================================== */
+.btn-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(380 / 430 * 100vw);
+  height: calc(60 / 430 * 100vw);
+  margin: calc(38 / 430 * 100vw) auto 0;
+  background-color: var(--brand-primary);
+  border-radius: calc(15 / 430 * 100vw);
+}
+
+.btn-user--hover {
+  opacity: 0.85;
+}
+
+.btn-user__text {
+  font-family: var(--font-sans);
+  font-weight: 500; /* 设计稿：PingFang SC Medium */
+  font-size: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-inverse);
+}
+
+/* 通用卡片按压反馈 */
+.card-hover {
+  opacity: 0.85;
+}

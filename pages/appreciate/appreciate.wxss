@@ -1,0 +1,281 @@
+/* ==========================================================================
+   底部导航（自定义 TabBar）的样式已抽到公共文件，与首页 / 导览页共用：
+      styles/tabbar.wxss
+   ⚠️ @import 必须写在文件最前面。 */
+@import "../../styles/tabbar.wxss";
+
+/* ==========================================================================
+   pages/appreciate/appreciate.wxss — 鉴赏页样式
+   --------------------------------------------------------------------------
+   设计稿：Figma「鉴赏页」（node 61:121），基准 430 × 932（iPhone 15 Pro）
+   单位方案：vw —— 与 app.wxss 约定一致，所有尺寸写 calc(设计稿px / 430 * 100vw)
+
+   布局方式：本页是一版「整屏构图」（背景 + 悬浮展品 + 下方说明），
+            各块之间没有文档流关系，因此统一用 absolute 按设计稿坐标摆放。
+            （绝对定位是本页的必要手段，不是偷懒：主图与左右箭头在纵向互相重叠，
+             用 flex 反而要写一堆负 margin 去凑。）
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面容器
+   --------------------------------------------------------------------------
+   固定一屏、不滚动（与设计稿一致），内容超出部分裁掉。
+   ========================================================================== */
+.page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-default);
+}
+
+/* ==========================================================================
+   二、渐变背景层
+   --------------------------------------------------------------------------
+   设计稿：430 × 864，三段线性渐变
+             156.2486° · 辅助色 6.6017% → 白 54.035% → 主色 99.678%
+   实测色值与 app.wxss 令牌完全一致（#c8b39b / #a57b52），故直接引用令牌。
+   ========================================================================== */
+.bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(864 / 430 * 100vw);
+  /*
+   * 两层背景（先写的在上）：
+   *   1) 10% 纯黑 —— 整体压暗。
+   *      设计稿量得的明度比「导出 CSS 直出」暗约 13%（浅处 244→211）。
+   *      这里先补 10%，剩下的约 3% 由上面的 .bg__grain 颗粒层带出来，
+   *      合起来与设计稿一致。嫌深/浅就只调这一个数字。
+   *   2) 三段主渐变（156.2486° 辅助色 → 白 → 主色）
+   */
+  background-image: linear-gradient(
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.1)
+    ),
+    linear-gradient(
+      156.2486deg,
+      var(--brand-secondary) 6.6017%,
+      #ffffff 54.035%,
+      var(--brand-primary) 99.678%
+    );
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%;
+}
+
+/* --------------------------------------------------------------------------
+   颗粒纹理层
+   --------------------------------------------------------------------------
+   设计稿的渐变层带「噪点」填充（横向逐像素随机、振幅约 6 个灰阶），
+   但 Figma 的代码导出只给 linear-gradient，噪点不会带出来 ——
+   真机上就少了这层质感 / 陶瓷的粗颗粒感。
+
+   还原方式：一张 64 × 64 的 8bit 灰度随机噪点图平铺
+             （64px 对应设计稿 64 个单位 → 每个噪点 = 1 个单位，与设计稿颗粒同粗）。
+   为什么用 base64 内联：WXSS 的 background-image 【不支持本地路径】，
+             只能用网络图或 base64（项目里 splash 的箭头也是这么处理的）。
+             整张 64×64 灰度 PNG 只有 4.2KB，base64 后约 5.5KB，可接受。
+   -------------------------------------------------------------------------- */
+.bg__grain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(864 / 430 * 100vw);
+  opacity: 0.095;
+  background-image: url("data:image/png;base64,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");
+  background-repeat: repeat;
+  background-size: calc(64 / 430 * 100vw) calc(64 / 430 * 100vw);
+}
+
+/* ==========================================================================
+   三、导航栏
+   --------------------------------------------------------------------------
+   设计稿：条高 52，顶边 y=75（= 状态栏 54 + 21），标题与搜索图标在其中垂直居中。
+   状态栏高度由 appreciate.js 注入 --status-bar-h，避免标题被刘海 / 灵动岛压住。
+   ========================================================================== */
+.navbar {
+  position: absolute;
+  top: calc(var(--status-bar-h, 44px) + 21 / 430 * 100vw);
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(52 / 430 * 100vw);
+}
+
+/* 标题「赏文物」：26px / 行高 22 / 一级文字 */
+.navbar__title {
+  font-family: var(--font-serif);
+  font-size: calc(26 / 430 * 100vw);
+  line-height: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* 搜索图标：24 × 24，右边距 30（设计稿 x=376，376+24+30 = 430） */
+.navbar__search {
+  position: absolute;
+  right: calc(30 / 430 * 100vw);
+  width: calc(24 / 430 * 100vw);
+  height: calc(24 / 430 * 100vw);
+}
+
+.navbar__search--hover {
+  opacity: 0.6;
+}
+
+.navbar__icon {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   四、分类「陶 | 瓷」
+   --------------------------------------------------------------------------
+   设计稿：居中，顶边 y=158，22px / 行高 24 / 字距 12。
+   两段不同色是设计稿原本的拆分（不是笔误）：
+     「陶」一级文字， 「|瓷」二级文字。
+   ========================================================================== */
+.category {
+  position: absolute;
+  top: calc(158 / 430 * 100vw);
+  right: 0;
+  left: 0;
+  /*
+   * ⚠️ 字距补偿
+   * ------------------------------------------------------------------
+   * CSS 的 letter-spacing 会在【每个字后面】都补一份间距，包括最后一个字。
+   * 居中时这段「尾巴」也算进宽度，于是整段文字看上去比几何中心偏左 字距/2
+   * （本例 12px 字距 → 偏左 6px）。Figma 按字墨居中，没有这个偏移。
+   * 补一个等宽的左内边距把内容盒左边收窄，居中结果就右移 字距/2，与设计稿对齐。
+   */
+  padding-left: calc(12 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(22 / 430 * 100vw);
+  line-height: calc(24 / 430 * 100vw);
+  letter-spacing: calc(12 / 430 * 100vw);
+  text-align: center;
+}
+
+/*
+ * ⚠️ 每条 <text> 都显式声明 font-family
+ * --------------------------------------------------------------------------
+ * 小程序 <text> 组件对「父级 font-family」的继承不稳定，只靠 .category 上
+ * 那一句可能命中不了，会被系统用无衬线体（黑体）兜底。
+ * 见 app.wxss「字体」段落里的实测说明。
+ */
+.category__on {
+  font-family: var(--font-serif);
+  color: var(--text-level-1);
+}
+
+.category__off {
+  font-family: var(--font-serif);
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   五、展品舞台
+   --------------------------------------------------------------------------
+   设计稿：430 × 573，水平居中、顶边 y=126。
+   ⚠️ 主图素材是「抠图」（75% 面积透明），叠在渐变背景上呈现悬浮感，
+      所以这里用 aspectFit 而不是 aspectFill —— 素材与容器比例本就一致
+      （860/1146 = 430/573 = 0.7504），两者结果相同，但 aspectFit 不会误裁。
+   ========================================================================== */
+.stage {
+  position: absolute;
+  top: calc(126 / 430 * 100vw);
+  right: 0;
+  left: 0;
+  height: calc(573 / 430 * 100vw);
+}
+
+.stage__img {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- 左右切换箭头 ---
+   设计稿：图标本体 14.456 × 26.228，纵向 y=418（舞台内 = 418-126 = 292），
+          左右距屏幕边 12（12 与 403.544+14.456=418 → 右边距也是 12）。
+   触摸热区：图标本身太窄（14px）不好点，用「padding 撑大 + 等量负 margin 抵消」
+            把热区扩到约 38 × 54，而图标仍停在设计稿标注的位置上。 */
+.stage__nav {
+  position: absolute;
+  top: calc(292 / 430 * 100vw);
+  box-sizing: content-box;
+  width: calc(14.456 / 430 * 100vw);
+  height: calc(26.228 / 430 * 100vw);
+  padding: calc(14 / 430 * 100vw) calc(12 / 430 * 100vw);
+  margin: calc(-14 / 430 * 100vw) calc(-12 / 430 * 100vw);
+  transition: opacity 0.18s ease;
+}
+
+.stage__nav--prev {
+  left: calc(12 / 430 * 100vw);
+}
+
+.stage__nav--next {
+  right: calc(12 / 430 * 100vw);
+}
+
+.stage__nav--hover {
+  opacity: 0.55;
+}
+
+.stage__nav-icon {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   六、展品说明
+   --------------------------------------------------------------------------
+   设计稿：名称顶边 y=695（28px / 行高 22 / 字距 12），
+          描述顶边 y=749（18px / 行高 24 / 字距 1.8）。
+   两者行盒间距 = 749 - (695 + 22) = 32。
+   ⚠️ 设计稿此处的 left 是 calc(50% + 1px) —— 即比几何居中右移 1px，
+      照搬保留。
+   ========================================================================== */
+.caption {
+  position: absolute;
+  top: calc(695 / 430 * 100vw);
+  right: 0;
+  left: 0;
+  font-family: var(--font-serif);
+  text-align: center;
+}
+
+.caption__title {
+  display: block;
+  position: relative;
+  left: calc(1 / 430 * 100vw);
+  /* 字距补偿 12（= 字距），再叠加设计稿自带的 +1px —— 见 .category 的说明 */
+  padding-left: calc(12 / 430 * 100vw);
+  /* 见 .category__on：<text> 不吃父级字体，必须逐条声明 */
+  font-family: var(--font-serif);
+  font-size: calc(28 / 430 * 100vw);
+  line-height: calc(22 / 430 * 100vw);
+  letter-spacing: calc(12 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+.caption__desc {
+  display: block;
+  position: relative;
+  left: calc(1 / 430 * 100vw);
+  /* 字距补偿 1.8（= 字距） */
+  padding-left: calc(1.8 / 430 * 100vw);
+  margin-top: calc(32 / 430 * 100vw);
+  /* 见 .category__on：<text> 不吃父级字体，必须逐条声明 */
+  font-family: var(--font-serif);
+  font-size: calc(18 / 430 * 100vw);
+  line-height: calc(24 / 430 * 100vw);
+  letter-spacing: calc(1.8 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
