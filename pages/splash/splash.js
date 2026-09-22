@@ -1,7 +1,7 @@
 /**
  * pages/splash/splash.js — 启动页
  * --------------------------------------------------------------------------
- * 职责：停留展示 + 引导用户向上滑动进入首页
+ * 职责：停留展示 + 引导用户向上滑动，渐隐后进入登录页
  *
  * 多机型适配要点：
  *   启动页为全屏沉浸式布局（navigationStyle: custom），
@@ -9,10 +9,14 @@
  *   使顶部 LOGO 区避开状态栏与胶囊按钮，适配 iPhone 15 Pro / 17 Pro Max 等不同机型。
  */
 
+const transition = require('../../utils/transition');
+
 Page({
   data: {
     /** 是否已触发跳转，防止重复跳转 */
     hasNavigated: false,
+    /** 转场：退场中（绑定 .page-fade--hidden，整页淡出后跳转） */
+    leaving: false,
     /** 状态栏高度 CSS 变量（由 applySafeArea 注入，绑定到根节点 style） */
     safeAreaStyle: '--status-bar-h: 44px;',
   },
@@ -34,9 +38,7 @@ Page({
    * 页面卸载时清理定时器，避免内存泄漏
    */
   onUnload() {
-    if (this._redirectTimer) {
-      clearTimeout(this._redirectTimer);
-    }
+    transition.clear(this);
   },
 
   /* ========================================================================
@@ -58,27 +60,20 @@ Page({
           ? wx.getWindowInfo()
           : wx.getSystemInfoSync();
 
-      let statusBarHeight = windowInfo.statusBarHeight || 44;
+      const statusBarHeight = windowInfo.statusBarHeight || 44;
 
       /*
-       * 胶囊按钮是最可靠的「右上安全区」参考：
-       *   capsuleBottom = capsule.top + capsule.height
-       * 若胶囊底部比状态栏更低，取其差值作为额外顶部留白，
-       * 保证 LOGO 区不与胶囊（右上「...」）视觉冲突。
+       * ⚠️ 这里【不并入胶囊按钮底部】，只用状态栏高度
+       * ------------------------------------------------------------------
+       * 早期版本取 max(状态栏, 胶囊底)，iPhone 15 Pro 上胶囊底约 86，
+       * 于是顶部留白变成 82 —— 整块内容被下推约 46px，
+       * 主标题从设计稿的 y≈176 掉到 y≈218，构图明显偏低。
+       *
+       * 之所以可以只用状态栏高度：本页 LOGO 区是【左对齐】的
+       * （设计稿 x 45.8–69.7），而胶囊在【右上角】（x 约 278–365），
+       * 两者横向完全不重叠，不存在遮挡或误触风险。
+       * 若以后把品牌区改成通栏或右对齐，需要把胶囊判断加回来。
        */
-      if (typeof wx.getMenuButtonBoundingClientRect === 'function') {
-        try {
-          const capsule = wx.getMenuButtonBoundingClientRect();
-          if (capsule && capsule.height) {
-            const capsuleBottom = capsule.top + capsule.height;
-            // 取较大值，确保状态栏与胶囊都被避开
-            statusBarHeight = Math.max(statusBarHeight, capsuleBottom);
-          }
-        } catch (capErr) {
-          console.warn('[splash] 获取胶囊位置失败，回退状态栏高度:', capErr);
-        }
-      }
-
       this.setData({
         safeAreaStyle: `--status-bar-h: ${statusBarHeight}px;`,
       });
@@ -92,7 +87,7 @@ Page({
   },
 
   /* ========================================================================
-     交互：向上滑动进入首页
+     交互：向上滑动，渐隐后进入登录页
      ======================================================================== */
 
   /**
@@ -116,7 +111,7 @@ Page({
     const deltaY = this._touchStartY - touch.clientY;
 
     if (deltaY > 30) {
-      this.navigateToHome();
+      this.navigateToLogin();
     }
   },
 
@@ -124,25 +119,32 @@ Page({
    * 点击任意区域也可进入（兜底交互，兼顾不使用滑动的用户）
    */
   onTap() {
-    this.navigateToHome();
+    this.navigateToLogin();
   },
 
   /**
-   * 跳转首页并卸载启动页
-   * 说明：使用 redirectTo 而非 navigateTo，避免用户可回退到启动页
+   * 渐隐后跳转登录页并卸载启动页
+   * 说明：
+   *   - 先触发整页淡出动画（leaving → .page-fade--hidden），
+   *     待动画结束（FADE_MS）再跳转，避免生硬切换；
+   *     登录页 onLoad 时会从 opacity:0 淡入，两段接力即为设计稿的交叉溶解；
+   *   - 使用 redirectTo 而非 navigateTo，避免用户可回退到启动页。
    */
-  navigateToHome() {
+  navigateToLogin() {
     if (this.data.hasNavigated) return;
 
     this.setData({ hasNavigated: true });
 
-    wx.redirectTo({
-      url: '/pages/index/index',
-      fail: (err) => {
-        console.error('[splash] 跳转失败:', err);
-        // 跳转失败时重置状态，允许用户重试
-        this.setData({ hasNavigated: false });
-      },
+    // 先淡出（FADE_MS），再跳转；登录页随后淡入，两段接力成一次溶解
+    transition.leave(this, () => {
+      wx.redirectTo({
+        url: '/pages/login/login',
+        fail: (err) => {
+          console.error('[splash] 跳转失败:', err);
+          // 跳转失败时重置状态，允许用户重试
+          this.setData({ hasNavigated: false, leaving: false });
+        },
+      });
     });
   },
 });

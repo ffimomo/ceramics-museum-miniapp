@@ -13,10 +13,18 @@
        三、底部导航（首页 / 导览 / 鉴赏 / 我的，自定义 TabBar）
 
      ⚠️ 图片 / 图标（绝对路径，一律正斜杠）：
-       卡片背景  /assets/images/card-*.webp  ← Figma 导出的「整卡背景」，@2x
+       卡片背景  /assets/images/card-*.jpg  ← Figma 导出的「整卡背景」，@2x
        轮播/地图 /img/*.jpg
        图标      /assets/icons/*.png
        大图一律 mode="aspectFill"（cover 等比裁切铺满）。
+
+     ⚠️🔴 本地图片禁止用 WebP（.webp）：
+         开发者工具是 Chromium 内核，能渲染 WebP；但真机的 image 组件
+         对「本地打包」的 WebP 支持不可靠（iOS 尤其），
+         表现为：电脑调试全部正常，真机上图片整片空白。
+         image 的 webp="true" 属性只对网络图片生效，救不了本地图。
+         本页 2026-09-19 已因该问题把卡片图从 .webp 全部换回 .jpg。
+         导出素材时请直接导 JPG/PNG，勿再转 WebP。
 
      ⚠️🔴 卡片背景图必须与卡片【等比例】，否则必然错乱：
          设计稿卡片尺寸 → @2x 源图尺寸
@@ -27,7 +35,7 @@
          再裁掉绝大部分高度，只剩中间一条横带 —— 看起来就是「图片错乱/错配」。
          换图时务必先确认源图比例与卡片一致。
      ========================================================================== -->
-<view class="page">
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}">
 
   <!-- ========================================================================
        一、顶部 Banner
@@ -54,7 +62,7 @@
 
       <!-- 2.1 票务预约（大卡：整卡背景图 + 文字） -->
       <view class="ticket" hover-class="card-hover" bindtap="onCardTap" data-name="票务预约">
-        <image class="ticket__img" src="/assets/images/card-ticket.webp" mode="aspectFill" aria-hidden="true" />
+        <image class="ticket__img" src="/assets/images/card-ticket.jpg" mode="aspectFill" aria-hidden="true" />
         <text class="ticket__title">票务预约</text>
         <text class="ticket__sub">立即购票</text>
       </view>
@@ -64,14 +72,14 @@
 
         <!-- 博物馆介绍 -->
         <view class="mini-card" hover-class="card-hover" bindtap="onCardTap" data-name="博物馆介绍">
-          <image class="mini-card__img" src="/assets/images/card-intro.webp" mode="aspectFill" aria-hidden="true" />
+          <image class="mini-card__img" src="/assets/images/card-intro.jpg" mode="aspectFill" aria-hidden="true" />
           <text class="mini-card__title">博物馆介绍</text>
           <text class="mini-card__sub">了解更多</text>
         </view>
 
         <!-- 预约讲解 -->
         <view class="mini-card" hover-class="card-hover" bindtap="onCardTap" data-name="预约讲解">
-          <image class="mini-card__img" src="/assets/images/card-guide.webp" mode="aspectFill" aria-hidden="true" />
+          <image class="mini-card__img" src="/assets/images/card-guide.jpg" mode="aspectFill" aria-hidden="true" />
           <text class="mini-card__title">预约讲解</text>
           <text class="mini-card__sub">专属讲解服务</text>
         </view>
@@ -94,28 +102,28 @@
 
     <!-- 近期特展（浅底图 → 深色文字） -->
     <view class="exhibit-card" hover-class="card-hover" bindtap="onCardTap" data-name="近期特展">
-      <image class="exhibit-card__img" src="/assets/images/card-exhibition.webp" mode="aspectFill" aria-hidden="true" />
+      <image class="exhibit-card__img" src="/assets/images/card-exhibition.jpg" mode="aspectFill" aria-hidden="true" />
       <text class="exhibit-card__title">近期特展</text>
       <text class="exhibit-card__sub">《纷纷天下》《茫茫南渡》《安居广州》</text>
     </view>
 
     <!-- 陶瓷文物（深底图 → 反色文字） -->
     <view class="exhibit-card exhibit-card--inverse" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷文物">
-      <image class="exhibit-card__img" src="/assets/images/card-relic.webp" mode="aspectFill" aria-hidden="true" />
+      <image class="exhibit-card__img" src="/assets/images/card-relic.jpg" mode="aspectFill" aria-hidden="true" />
       <text class="exhibit-card__title">陶瓷文物</text>
       <text class="exhibit-card__sub">赏千年非遗文物</text>
     </view>
 
     <!-- 陶瓷历史（浅底图 → 深色文字） -->
     <view class="exhibit-card" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷历史">
-      <image class="exhibit-card__img" src="/assets/images/card-history.webp" mode="aspectFill" aria-hidden="true" />
+      <image class="exhibit-card__img" src="/assets/images/card-history.jpg" mode="aspectFill" aria-hidden="true" />
       <text class="exhibit-card__title">陶瓷历史</text>
       <text class="exhibit-card__sub">看陶瓷千年之发展脉络</text>
     </view>
 
     <!-- 陶瓷手作（深底图 → 反色文字） -->
     <view class="exhibit-card exhibit-card--inverse" hover-class="card-hover" bindtap="onCardTap" data-name="陶瓷手作">
-      <image class="exhibit-card__img" src="/assets/images/card-craft.webp" mode="aspectFill" aria-hidden="true" />
+      <image class="exhibit-card__img" src="/assets/images/card-craft.jpg" mode="aspectFill" aria-hidden="true" />
       <text class="exhibit-card__title">陶瓷手作</text>
       <text class="exhibit-card__sub">观陶瓷手作，体验匠心之美</text>
     </view>
@@ -130,9 +138,12 @@
   <view class="tabbar">
     <view class="tabbar__list">
 
-      <!-- 首页（激活） -->
+      <!-- 首页（激活）
+           ⚠️ 图标颜色画在 PNG 里，激活/未激活是两套素材：
+              tab-{name}.png（浅暖灰） / tab-{name}-active.png（深棕）
+              切换激活项时必须换 src，不能只加类名。 -->
       <view class="tabbar__item tabbar__item--active" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="index">
-        <image class="tabbar__icon" src="/assets/icons/tab-home.png" mode="aspectFit" aria-hidden="true" />
+        <image class="tabbar__icon" src="/assets/icons/tab-home-active.png" mode="aspectFit" aria-hidden="true" />
         <text class="tabbar__label">首页</text>
       </view>
 

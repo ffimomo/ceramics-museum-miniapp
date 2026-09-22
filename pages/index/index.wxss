@@ -1,3 +1,8 @@
+/* 底部导航（自定义 TabBar）的样式已抽到公共文件，避免各页面各写一份而走样：
+   styles/tabbar.wxss
+   ⚠️ @import 必须写在文件最前面。 */
+@import "../../styles/tabbar.wxss";
+
 /* ==========================================================================
    pages/index/index.wxss — 首页样式
    --------------------------------------------------------------------------
@@ -14,9 +19,23 @@
 .page {
   min-height: 100vh;
   background-color: var(--bg-default);
-  /* 底部预留 TabBar 高度，避免短屏机型上末卡被固定导航遮挡 */
-  padding-bottom: calc(68 / 430 * 100vw);
+  /* 底部预留底栏高度，避免末卡被固定导航遮挡（--tabbar-h 见 styles/tabbar.wxss） */
+  padding-bottom: var(--tabbar-h);
 }
+
+/*
+ * 入场转场已统一到公共样式：app.wxss 的 .page-fade / .page-fade--hidden
+ * （由 utils/transition.js 驱动，全站 8 个页面共用一套）。
+ *
+ * ⚠️ 这里只做 opacity，【没有 transform】—— 这是刻意的：
+ *    元素只要有 transform（哪怕值是 translateY(0)）就会成为后代
+ *    position: fixed 的包含块。.tabbar 是 .page 的后代，一旦 .page 带了
+ *    transform，底部导航就不再相对「屏幕」定位、而是跟着内容滚到页面最底部，
+ *    表现为「只有滑到底才看得见导航」。
+ *    纯 opacity 不会创建这种包含块，所以整页（含底栏）一起淡出是安全的。
+ *    若以后要给转场加位移，必须把动画挪到 .hero / .content-card 这类
+ *    TabBar 的【兄弟节点】上，不能加在 .page。
+ */
 
 /* ==========================================================================
    二、顶部 Banner
@@ -25,7 +44,14 @@
    ========================================================================== */
 .hero {
   width: 100%;
-  height: calc(371 / 430 * 100vw);
+  /*
+   * 设计稿：Banner 底边约在 y=360（在 x=2 处量得深色区域延伸到 y≈359.5），
+   * 而内容卡片顶边在 y=346.5 —— 即卡片【上压】Banner 约 13.5px，
+   * 露出上面两个圆角的裁切。
+   * 早期写 371 / -24：Banner 多 11px、卡片多压 10.5px，两者叠加让
+   * 「今日开馆」以下的所有内容整体下移了约 21px。
+   */
+  height: calc(360 / 430 * 100vw);
   overflow: hidden;
 }
 
@@ -43,10 +69,13 @@
 .content-card {
   position: relative;
   z-index: 1;
-  margin-top: calc(-24 / 430 * 100vw);
-  padding: calc(20 / 430 * 100vw) calc(26 / 430 * 100vw) calc(29 / 430 * 100vw);
+  /* 卡片顶边 346.5，Banner 底边 360 → 上压 13.5 */
+  margin-top: calc(-13.5 / 430 * 100vw);
+  /* 上 18：卡片顶 346.5 →「今日开馆」行盒顶 364.2（设计稿间距 17.7） */
+  padding: calc(18 / 430 * 100vw) calc(26 / 430 * 100vw) calc(29 / 430 * 100vw);
   background-color: var(--bg-default);
-  border-radius: calc(20 / 430 * 100vw) calc(20 / 430 * 100vw) 0 0;
+  /* 设计稿实测圆角约 16（角弧从 x=17.4/y=346.5 收到 x=2.2/y=361） */
+  border-radius: calc(16 / 430 * 100vw) calc(16 / 430 * 100vw) 0 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -89,12 +118,13 @@
   margin-left: calc(14 / 430 * 100vw);
 }
 
-/* --- 票务预约大卡（240 × 156） --- */
+/* --- 票务预约大卡（240.5 × 154.7） ---
+   设计稿：x 26.1→266.6、y 404.6→559.3 */
 .ticket {
   position: relative;
   flex-shrink: 0;
-  width: calc(240 / 430 * 100vw);
-  height: calc(156 / 430 * 100vw);
+  width: calc(240.5 / 430 * 100vw);
+  height: calc(154.7 / 430 * 100vw);
   overflow: hidden;
   border-radius: calc(8 / 430 * 100vw);
   /* 暖棕底：设计稿专用色（不在 app.wxss 令牌表内） */
@@ -132,17 +162,19 @@
   color: var(--text-inverse);
 }
 
-/* --- 小卡（124 × 74，右侧上下两枚） --- */
+/* --- 小卡（123.5 × 71.5，右侧上下两枚） ---
+   设计稿：上卡 406.8→476.5、下卡 488.1→557.8，单张高 71.5、间距 11.6；
+   两枚合起来 154.7，与左侧票务大卡等高。 */
 .mini-card {
   position: relative;
   width: 100%;
-  height: calc(74 / 430 * 100vw);
+  height: calc(71.5 / 430 * 100vw);
   overflow: hidden;
   border-radius: calc(8 / 430 * 100vw);
 }
 
 .mini-card + .mini-card {
-  margin-top: calc(8 / 430 * 100vw);
+  margin-top: calc(11.7 / 430 * 100vw);
 }
 
 .mini-card__img {
@@ -291,63 +323,4 @@
    -------------------------------------------------------------------------- */
 .card-hover {
   opacity: 0.85;
-}
-
-/* ==========================================================================
-   四、底部导航（自定义 TabBar，固定底部）
-   --------------------------------------------------------------------------
-   外层负责白色底 + 顶部 1px 边框 + 底部安全区；
-   内层负责 68px 内容区（4 个 item 等距分布）。
-   ========================================================================== */
-.tabbar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  background-color: var(--bg-white);
-  border-top: 1px solid var(--border-default);
-  /* 底部安全区（iPhone 底部小黑条） */
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tabbar__list {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: calc(68 / 430 * 100vw);
-  padding-right: calc(36 / 430 * 100vw);
-  padding-left: calc(36 / 430 * 100vw);
-}
-
-.tabbar__item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: calc(36 / 430 * 100vw);
-}
-
-.tabbar__item--hover {
-  opacity: 0.7;
-}
-
-.tabbar__icon {
-  width: calc(32 / 430 * 100vw);
-  height: calc(32 / 430 * 100vw);
-}
-
-.tabbar__label {
-  margin-top: calc(4 / 430 * 100vw);
-  font-family: var(--font-sans);
-  font-size: calc(17 / 430 * 100vw);
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--text-level-2); /* 未激活：二级文字 */
-}
-
-/* 激活态：一级文字 + Medium 字重（PingFang SC 自带真实 Medium，非合成加粗） */
-.tabbar__item--active .tabbar__label {
-  font-weight: 500;
-  color: var(--text-level-1);
 }

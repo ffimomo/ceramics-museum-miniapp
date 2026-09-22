@@ -20,75 +20,21 @@
   height: 100vh;
   overflow: hidden;
   background-color: #f2ece1; /* 米黄宣纸兜底色，与设计稿背景基调一致 */
+  /* 入场转场已统一到公共样式：app.wxss 的 .page-fade / .page-fade--hidden */
 }
 
 /* ==========================================================================
    二、背景层
-   --------------------------------------------------------------------------
-   叠放顺序（由下到上）：
-     .login__bg-fallback  z-index: 0   ← 兜底色（宣纸质感渐变）
-     .login__bg           z-index: 1   ← 背景照片，压在兜底层之上
-     .login__content      z-index: 2   ← 页面内容，压在所有背景之上
-
-   ⚠️ 本层必须是照片【下方】。它的 background-color 是不透明的，
-      一旦 z-index 高于 .login__bg，就会把照片整屏盖住 ——
-      这正是此前「真机上背景不见了」的根因。
-      它的作用仅为：图片加载中/加载失败时兜住页面，不让露白。
    ========================================================================== */
-
-/* 背景照片（压在兜底层之上） */
 .login__bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  /* 图片加载失败时，透出下方兜底层的米黄底色，不会露白 */
-}
-
-/*
- * 背景兜底：宣纸/陶瓷质感（最底层，z-index: 0）
- * --------------------------------------------------------------------------
- * 用多层 radial-gradient 模拟纸张的斑驳纹理与柔和明暗，
- * 叠加一个极浅的暖色 linear-gradient 作为基调。
- */
-.login__bg-fallback {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 0;
   width: 100%;
   height: 100%;
-  /* 底层：米黄暖调渐变 */
-  background-color: #f5f0e6;
-  background-image:
-    /* 左上角柔和暖光 */
-    radial-gradient(
-      ellipse 70% 50% at 18% 8%,
-      rgba(255, 253, 246, 0.95) 0%,
-      rgba(255, 253, 246, 0) 60%
-    ),
-    /* 右侧中部略深的宣纸纹理斑驳 */
-    radial-gradient(
-      ellipse 55% 38% at 92% 42%,
-      rgba(213, 196, 170, 0.5) 0%,
-      rgba(213, 196, 170, 0) 70%
-    ),
-    /* 左下角淡淡的阴影层次 */
-    radial-gradient(
-      ellipse 60% 45% at 8% 88%,
-      rgba(206, 188, 162, 0.42) 0%,
-      rgba(206, 188, 162, 0) 68%
-    ),
-    /* 中部微弱的竖向纤维感 */
-    linear-gradient(
-      180deg,
-      rgba(248, 243, 234, 0.6) 0%,
-      rgba(240, 232, 218, 0.35) 45%,
-      rgba(246, 240, 229, 0.6) 100%
-    );
 }
+
 
 /* ==========================================================================
    三、内容层（三段式纵向布局）
@@ -103,9 +49,16 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  /* 左右安全边距：设计稿内容区左右各 65px（430 宽下） */
-  padding-right: calc(28 / 430 * 100vw);
-  padding-left: calc(28 / 430 * 100vw);
+  /*
+   * 左右安全边距 50px
+   * ------------------------------------------------------------------
+   * 设计稿实测：「登陆」按钮 / 输入框左右边缘都在 x = 50 与 x = 380，
+   * 即内容宽 330、两侧各留 50。
+   * ⚠️ 早期写的是 28（注释里还留着 65 的旧标注，三方对不上），
+   *    会让表单横向铺得太满，与设计稿的「留白克制」观感不符。
+   */
+  padding-right: calc(50 / 430 * 100vw);
+  padding-left: calc(50 / 430 * 100vw);
   /* 顶部避开状态栏 */
   padding-top: calc(var(--status-bar-h, 44) + 20px);
   /* 底部避开 Home Indicator */
@@ -122,46 +75,68 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  /* 与下方表单区之间的间距 */
-  margin-bottom: calc(74 / 430 * 100vw);
+  /*
+   * 品牌区 / 表单区 / 第三方区之间用「等分剩余空间」的方式拉开。
+   * ------------------------------------------------------------------
+   * 设计稿实测三段间距分别为 83.8 / 93.0 / 92.2 —— 基本相等，
+   * 说明设计师用的就是「均分」而非逐个写死。
+   * 因此三块各自 margin-top: auto，浏览器会把剩余空间平分成三份，
+   * 任何屏高下间距都自洽，也不会像写死数值那样在高屏上被拉散。
+   */
+  margin-top: auto;
 }
 
 /*
  * Logo
  * --------------------------------------------------------------------------
- * 设计稿：花瓶线稿约 108 × 130 px（@2x），逻辑约 54 × 65
- * ⚠️ 素材为竖长形，宽高比保持 54 : 65，不要强行改成正方形
+ * 设计稿实测 63.2 × 83.5（比例 0.757）；素材 login-logo.png 为 64 × 85（比例 0.753），
+ * 两者几乎一致，按 63.5 × 84.3 呈现即可满框不变形。
+ * ⚠️ 早期写 62 × 75（比例 0.827），比例不符会让 aspectFit 上下留白，
+ *    LOGO 实际被缩得比标注更小。
  */
 .brand__logo {
   display: block;
-  width: calc(62 / 430 * 100vw);
-  height: calc(75 / 430 * 100vw);
+  width: calc(63.5 / 430 * 100vw);
+  height: calc(84.3 / 430 * 100vw);
   /* 没有图时隐藏，避免出现破图占位 */
   opacity: 1;
 }
 
 /*
- * Logo 占位框样式已移除
- * --------------------------------------------------------------------------
- * 素材未到位时曾在 WXML 里放过虚线占位框，现 Logo 素材已接入，
- * 占位节点早已从 WXML 删除，相关样式成为无效代码，一并清理。
- * 若将来需要临时占位，可在 WXML 中重新加回节点时再补样式。
+ * Logo 占位框（素材未填时可见）
+ * ⚠️ 图片填好后请删除 WXML 里的 .brand__logo-placeholder 节点，
+ *    或保留也无妨（它绝对定位在 Logo 位置，会被图片覆盖）
  */
+.brand__logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(62 / 430 * 100vw);
+  height: calc(75 / 430 * 100vw);
+  /* 与图片同位叠加 */
+  margin-top: calc(-75 / 430 * 100vw);
+  border: 1px dashed rgba(122, 98, 74, 0.35);
+  border-radius: calc(6 / 430 * 100vw);
+}
 
-/* 中文馆名：设计稿约 24px，宋体，深棕色 */
+.brand__logo-placeholder-text {
+  font-family: var(--font-sans);
+  font-size: calc(10 / 430 * 100vw);
+  color: rgba(122, 98, 74, 0.55);
+  letter-spacing: 0.08em;
+}
+
+/* 中文馆名：设计稿字高 22.5 / 字宽 119（5 字）→ 字号约 23px，宋体，深棕色 */
 .brand__name-cn {
   display: block;
-  margin-top: calc(14 / 430 * 100vw);
-  font-family: var(--font-serif);
-  font-size: calc(24 / 430 * 100vw);
   /*
-   * ⚠️ 字重固定 400，不要改大
-   * ----------------------------------------------------------------
-   * 内嵌的思源宋体子集只有 Regular 一个字重（usWeightClass=400），
-   * 且无可变字重轴（fvar）。若写 500 / 600，渲染器会做「合成加粗」
-   * （faux bold，向四周描边），这会抹平宋体「横细竖粗」的笔画对比，
-   * 视觉上退化成黑体 —— 这正是此前「宋体黑体混用」的根因之一。
+   * ⚠️ 这里要填的是【行盒间距】不是【字墨间距】
+   * LOGO 盒底 228.1 → 中文行盒顶 240.7（中文墨迹顶 245.5 已含约 4.8 的行高余量）
+   * 早期误用字墨间距 18.9，会让品牌区整体高出一截。
    */
+  margin-top: calc(12.5 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(23 / 430 * 100vw);
   font-weight: 400;
   line-height: 1.3;
   color: #3d332a;
@@ -169,14 +144,15 @@
   text-align: center;
 }
 
-/* 英文馆名：设计稿约 15px，同样宋体（项目约定：英文也走 serif） */
+/* 英文馆名：设计稿整串字宽 148.9 → 字号约 18px，同样宋体（项目约定：英文也走 serif） */
 .brand__name-en {
   display: block;
-  margin-top: calc(2 / 430 * 100vw);
+  /* 中文行盒底 270.6 → 英文行盒顶 271.7（同样按行盒而非字墨计算） */
+  margin-top: calc(1 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
+  font-size: calc(18 / 430 * 100vw);
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.2;
   color: #3d332a;
   letter-spacing: 0.04em;
   text-align: center;
@@ -187,18 +163,21 @@
    ========================================================================== */
 .form {
   display: flex;
-  flex: 1;
+  flex: 0 0 auto;
   flex-direction: column;
   min-height: 0;
+  /* 与上方品牌区、下方第三方区均分剩余空间 */
+  margin-top: auto;
 }
 
-/* 标题「欢迎登陆」：设计稿约 30px，宋体，深色 */
+/* 标题「欢迎登陆」：设计稿字高 26.1 / 字步进 29.3 → 字号约 28px，宋体，深色 */
 .form__title {
   display: block;
+  /* 标题行盒底 → 第一格输入框顶，设计稿间距 29.8 */
   margin-bottom: calc(30 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(30 / 430 * 100vw);
-  font-weight: 400; /* 同上：字体仅 Regular，禁止合成加粗 */
+  font-size: calc(28 / 430 * 100vw);
+  font-weight: 400;
   line-height: 1.3;
   color: #2f2923;
   letter-spacing: 0.04em;
@@ -207,17 +186,21 @@
 /* --------------------------------------------------------------------------
    输入框（手机号 / 密码 共用）
    --------------------------------------------------------------------------
-   设计稿：浅色描边胶囊圆角矩形，高度约 62px，圆角约 10px
+   设计稿实测：顶边 y=440.2、底边 y=491.2 → 高 51px，圆角约 11px
+   ⚠️ 早期写 62px（比设计稿高 11px，两格之间被撑开了 10px 的累计误差），
+      是登录页纵向错位最明显的一处。
    -------------------------------------------------------------------------- */
 .field {
   display: flex;
   align-items: center;
   width: 100%;
-  height: calc(62 / 430 * 100vw);
-  margin-bottom: calc(20 / 430 * 100vw);
-  padding: 0 calc(18 / 430 * 100vw);
+  height: calc(51 / 430 * 100vw);
+  /* 两格间距：491.2 → 512.1，设计稿 20.9 */
+  margin-bottom: calc(21 / 430 * 100vw);
+  /* 左 14.5：框左 50.1 → 图标左 64.6（设计稿实测）；右 10：眼睛图标右 368.3 */
+  padding: 0 calc(10 / 430 * 100vw) 0 calc(14.5 / 430 * 100vw);
   border: 1px solid rgba(168, 148, 122, 0.55);
-  border-radius: calc(10 / 430 * 100vw);
+  border-radius: calc(11 / 430 * 100vw);
   background-color: rgba(255, 253, 248, 0.55);
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -228,11 +211,11 @@
   background-color: rgba(255, 253, 248, 0.82);
 }
 
-/* 左侧 icon */
+/* 左侧 icon：设计稿实测约 21 × 22.5（书签）/ 21 × 22.5（锁） */
 .field__icon {
   flex-shrink: 0;
-  width: calc(20 / 430 * 100vw);
-  height: calc(20 / 430 * 100vw);
+  width: calc(22 / 430 * 100vw);
+  height: calc(22 / 430 * 100vw);
 }
 
 /*
@@ -243,8 +226,9 @@
 .field__sep {
   flex-shrink: 0;
   width: 1px;
-  height: calc(26 / 430 * 100vw);
-  margin-left: calc(12 / 430 * 100vw);
+  /* 设计稿：竖线高约 22.5，位于图标右 85.0 → 竖线 96.6（间距 11.6） */
+  height: calc(22 / 430 * 100vw);
+  margin-left: calc(10.5 / 430 * 100vw);
   background-color: rgba(168, 148, 122, 0.42);
 }
 
@@ -261,15 +245,17 @@
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 calc(14 / 430 * 100vw);
+  /* 竖线 97.3 → 占位文字 106.8，设计稿间距 9.5 */
+  padding: 0 calc(9.5 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(17 / 430 * 100vw);
+  /* 设计稿占位文字字高 14.5 → 字号约 16px */
+  font-size: calc(16 / 430 * 100vw);
   color: #2f2923;
 }
 
 .field__placeholder {
   font-family: var(--font-serif);
-  font-size: calc(17 / 430 * 100vw);
+  font-size: calc(16 / 430 * 100vw);
   color: rgba(122, 106, 88, 0.62);
 }
 
@@ -289,22 +275,10 @@
 }
 
 .field__eye-icon {
-  width: calc(22 / 430 * 100vw);
-  height: calc(22 / 430 * 100vw);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  /* 设计稿实测眼睛图标 24 × 18.2（素材 32 × 32，按 24 盒 aspectFit） */
+  width: calc(24 / 430 * 100vw);
+  height: calc(24 / 430 * 100vw);
 }
-
-/*
- * 说明：眼睛的明/暗文态由两张独立素材切换，不再靠 CSS 模拟
- * --------------------------------------------------------------------------
- * - 睁眼 icon-eye.png       -> showPassword 为 true（明文）时显示
- * - 闭眼 icon-eye-close.png -> showPassword 为 false（密文）时显示
- * 两张图同源同色（--icon-secondary #B7AA9A），按 24x24 渲染时视觉重心
- * 相差 0.26px，切换时无跳动。切换逻辑见 login.js 的 togglePassword()。
- *
- * 历史：素材只有一张睁眼图时，曾用一个修饰类降透明度 + 微缩来模拟闭眼；
- *      闭眼图补齐后，该规则与 WXML 中的对应类名均已移除。
- */
 
 /* 眼睛 icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
 .field__eye-placeholder {
@@ -332,8 +306,16 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-top: calc(4 / 430 * 100vw);
-  margin-bottom: calc(38 / 430 * 100vw);
+  /* 上一格输入框自带 21px 下边距（flex 下不与本行 margin 合并），这里不再追加 */
+  margin-top: 0;
+  /* 勾选行底 → 按钮顶，设计稿 18.2 */
+  margin-bottom: calc(18 / 430 * 100vw);
+  /*
+   * 设计稿里这一行整体比按钮左右各内收约 10px
+   * （勾选框左 59.4 / 按钮左 50.1，忘记密码右 361 / 按钮右 379.9）
+   */
+  padding-right: calc(12 / 430 * 100vw);
+  padding-left: calc(9 / 430 * 100vw);
 }
 
 .remember {
@@ -341,7 +323,12 @@
   align-items: center;
 }
 
-/* 圆形勾选框：设计稿为圆形空心圈 */
+/*
+ * 勾选框：设计稿是【圆角方形】而非圆形
+ * --------------------------------------------------------------------------
+ * 实测 20 × 20、圆角约 5px（线宽 1px，描边色与输入框一致）。
+ * ⚠️ 早期写成 border-radius: 50%（正圆），与设计稿的方框造型不符。
+ */
 .remember__box {
   display: flex;
   flex-shrink: 0;
@@ -349,8 +336,8 @@
   justify-content: center;
   width: calc(20 / 430 * 100vw);
   height: calc(20 / 430 * 100vw);
-  border: 1px solid rgba(168, 148, 122, 0.75);
-  border-radius: 50%;
+  border: 1px solid rgba(168, 148, 122, 0.85);
+  border-radius: calc(5 / 430 * 100vw);
   background-color: transparent;
   transition: background-color 0.18s ease, border-color 0.18s ease;
 }
@@ -361,41 +348,26 @@
   background-color: var(--brand-primary);
 }
 
-/*
- * 勾选标记：纯 CSS 绘制，不用字符
- * --------------------------------------------------------------------------
- * 原本用一个对勾字符（U+2713）来显示，但该字符不在内嵌的思源宋体子集里
- * （思源宋体本身就不含这个符号），真机上会被系统用其他字体兜底渲染，
- * 既可能显示成豆腐块，也会破坏「全站宋体」的一致性。
- *
- * 改用两条边框旋转 45° 拼出的对勾：
- *   - 零字体依赖，任何机型、任何字体下渲染都一致
- *   - 不依赖字体文件是否包含该符号，不需要为它单独补字
- *   - 矢量绘制，任意缩放都清晰
- */
 .remember__tick {
-  display: block;
-  width: calc(9 / 430 * 100vw);
-  height: calc(5 / 430 * 100vw);
-  margin-top: calc(-2 / 430 * 100vw); /* 视觉重心补偿：让对勾在圆内居中 */
-  border-left: 2px solid var(--text-inverse);
-  border-bottom: 2px solid var(--text-inverse);
-  transform: rotate(-45deg);
-  font-size: 0; /* 彻底屏蔽可能残留的字符渲染 */
+  font-family: var(--font-sans);
+  font-size: calc(12 / 430 * 100vw);
+  line-height: 1;
+  color: var(--text-inverse);
 }
 
 .remember__label {
   margin-left: calc(9 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(16 / 430 * 100vw);
+  /* 设计稿「记住密码」字宽 55 / 4 字 → 每字 13.75，字号约 14px（早期 16 偏大） */
+  font-size: calc(14 / 430 * 100vw);
   color: #3d332a;
   letter-spacing: 0.02em;
 }
 
-/* 忘记密码链接 */
+/* 忘记密码链接：与「记住密码」同号 */
 .form__forget {
   font-family: var(--font-serif);
-  font-size: calc(16 / 430 * 100vw);
+  font-size: calc(14 / 430 * 100vw);
   color: var(--brand-primary);
   letter-spacing: 0.02em;
 }
@@ -410,13 +382,15 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(62 / 430 * 100vw);
+  /* 设计稿实测按钮 y 623.2 → 674.8，高 51.6（早期 62 偏高 10px） */
+  height: calc(52 / 430 * 100vw);
   margin: 0 auto;
   border-radius: calc(10 / 430 * 100vw);
   background-color: transparent; /* 实际色在下面覆盖 */
   font-family: var(--font-serif);
-  font-size: calc(21 / 430 * 100vw);
-  font-weight: 400; /* 同上：字体仅 Regular，禁止合成加粗 */
+  /* 设计稿「登陆」字宽 37.8 / 字高 17.4 → 字号约 19.5px（早期 24 偏大） */
+  font-size: calc(19.5 / 430 * 100vw);
+  font-weight: 400;
   line-height: 1;
   color: var(--text-inverse);
   letter-spacing: 0.08em;
@@ -442,12 +416,14 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: calc(20 / 430 * 100vw);
+  /* 按钮底 674.8 → 注册行行盒顶 686.9，设计稿间距 12.1 */
+  margin-top: calc(12 / 430 * 100vw);
 }
 
 .form__register-label {
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
+  /* 整串「还没有注册？去注册」字宽 117.7 / 9 字 → 每字 13.1，字号约 13px */
+  font-size: calc(13 / 430 * 100vw);
   color: #6f6355;
   letter-spacing: 0.02em;
 }
@@ -456,8 +432,8 @@
 .form__register-link {
   margin-left: calc(8 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
-  font-weight: 400; /* 同上：字体仅 Regular，禁止合成加粗 */
+  font-size: calc(13 / 430 * 100vw);
+  font-weight: 400;
   color: var(--brand-primary);
   letter-spacing: 0.02em;
 }
@@ -471,9 +447,10 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  /* 推到底部 */
+  /* 与上方品牌区、表单区均分剩余空间（三块各自的 margin-top:auto 平分） */
   margin-top: auto;
-  padding-bottom: calc(24 / 430 * 100vw);
+  /* 圆形按钮底 878.9 → 屏幕底 932，设计稿留白约 19（安全区另计） */
+  padding-bottom: calc(19 / 430 * 100vw);
 }
 
 /* 分割线 + 居中标题 */
@@ -492,9 +469,11 @@
 
 .third__title {
   flex-shrink: 0;
-  padding: 0 calc(14 / 430 * 100vw);
+  /* 文字与两侧分割线的间距，设计稿约 24 */
+  padding: 0 calc(24 / 430 * 100vw);
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
+  /* 字宽 77.7 / 6 字 → 每字 12.95，字号约 13px */
+  font-size: calc(13 / 430 * 100vw);
   color: #7b6e5e;
   letter-spacing: 0.04em;
 }
@@ -504,9 +483,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: calc(26 / 430 * 100vw);
+  /* 「其他登陆方式」行盒底 809.4 → 圆形按钮顶 830.8，设计稿间距约 21 */
+  margin-top: calc(21 / 430 * 100vw);
   /* 两个按钮之间的间距 */
-  column-gap: calc(44 / 430 * 100vw);
+  column-gap: calc(45 / 430 * 100vw);
 }
 
 .third__btn {
@@ -514,8 +494,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(56 / 430 * 100vw);
-  height: calc(56 / 430 * 100vw);
+  /* 设计稿实测直径约 49（早期 56 偏大） */
+  width: calc(49 / 430 * 100vw);
+  height: calc(49 / 430 * 100vw);
   border: 1px solid rgba(168, 148, 122, 0.48);
   border-radius: 50%;
   background-color: transparent;
@@ -527,11 +508,28 @@
 }
 
 .third__btn-icon {
-  width: calc(28 / 430 * 100vw);
-  height: calc(28 / 430 * 100vw);
+  width: calc(34 / 430 * 100vw);
+  height: calc(34 / 430 * 100vw);
 }
 
-/*
- * 第三方按钮占位框样式已移除 —— 微信 / QQ 图标已接入，
- * 占位节点不在 WXML 中，保留样式只会成为无效代码。
- */
+/* icon 占位（素材未填时可见）—— 填好图后可删除此节点 */
+.third__btn-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(28 / 430 * 100vw);
+  height: calc(28 / 430 * 100vw);
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(122, 98, 74, 0.32);
+  border-radius: calc(4 / 430 * 100vw);
+}
+
+.third__btn-placeholder-text {
+  font-family: var(--font-sans);
+  font-size: calc(9 / 430 * 100vw);
+  color: rgba(122, 98, 74, 0.6);
+  letter-spacing: 0;
+}

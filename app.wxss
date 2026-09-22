@@ -39,7 +39,9 @@ page {
   --border-thick: #d4c8ba; /* 粗（后续界面会用到） */
 
   /* ===== 补充色（不在 Figma 变量表内，按设计稿实际需要补充） ===== */
-  --accent-bg: #fce9dc; /* 浅杏底：预约页「个人/团队/志愿者」选项卡 */
+  /* 浅米底：预约页「个人预约 / 团队预约 / 志愿者服务」三张选项卡的底色
+     （原 #fce9dc，按设计稿调整改为 #ece4d5 —— 更偏米灰、饱和度更低） */
+  --accent-bg: #ece4d5;
 
   /* ===== 字体 ===== */
   /*
@@ -217,4 +219,33 @@ button::after {
   width: 100%;
   padding-right: calc(16 / 430 * 100vw);
   padding-left: calc(16 / 430 * 100vw);
+}
+
+/* ==========================================================================
+   四、页面转场（渐隐渐现）
+   --------------------------------------------------------------------------
+   设计稿录屏里所有页面切换都是「交叉溶解」：旧页淡出、新页淡入，约 300ms、
+   缓出、无位移。小程序做不到两页同屏，拆成「旧页淡出 → 跳转 → 新页淡入」两段接力。
+
+   用法（详见 utils/transition.js 顶部注释）：
+     · 页面根节点加 class="page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}"
+     · onReady 调 transition.enter(this)；跳转处用 transition.leave(this, fn)
+
+   ⚠️ 这两个类必须挂在【同一个元素】上 —— transition 属性写在元素自身，
+      挂到父级子级分开就失效。
+   ⚠️ 时长 0.26s 需与 utils/transition.js 的 FADE_MS 保持一致。
+   ========================================================================== */
+.page-fade {
+  transition: opacity 0.26s ease-out;
+}
+
+.page-fade--hidden {
+  opacity: 0;
+}
+
+/* 用户开启「减少动态效果」时直接切换，不做淡入淡出 */
+@media (prefers-reduced-motion: reduce) {
+  .page-fade {
+    transition: none;
+  }
 }
