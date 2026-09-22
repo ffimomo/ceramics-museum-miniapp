@@ -1,0 +1,116 @@
+<!-- ==========================================================================
+     pages/booking-person/booking-person.wxml — 个人预约界面
+     --------------------------------------------------------------------------
+     设计稿：Figma「个人预约界面」（node 25-154），基准 430 × 932（iPhone 15 Pro）
+     结构（自上而下）：
+       一、导航栏（返回 + 标题「个人预约」）
+       二、参观日期（周历选择网格）
+       三、参观时段（上午 / 下午两个时段）
+       四、游客信息（已选游客 + 添加游客）
+       五、联系方式（电话号码）
+       六、提交预约按钮
+
+     ⚠️ 图标：游客行的移除/更多图标 → /assets/icons/icon-remove.png、icon-more.png
+            返回箭头、加号 → 内联 SVG（沿用项目「小图形用 SVG」惯例）
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、导航栏
+       ======================================================================== -->
+  <view class="navbar">
+    <view class="navbar__bar">
+      <view class="navbar__back" hover-class="navbar__back--hover" bindtap="onBack" aria-label="返回">
+        <view class="navbar__chevron" aria-hidden="true" />
+      </view>
+      <text class="navbar__title">个人预约</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       二、内容区（四张卡片 + 提交按钮）
+       ======================================================================== -->
+  <view class="content">
+
+    <!-- 1. 参观日期
+         ----------------------------------------------------------------------
+         三态（见 /assets 按钮设计稿）：
+           默认 = 页面底色 + 辅助色描边 + 二级文字
+           约满 = 灰底，不可点
+           选中 = 品牌主色实底 + 白字
+         单选：再次点另一个会把原来那个还原成默认。
+         ---------------------------------------------------------------------- -->
+    <view class="card card--date">
+      <text class="card__title">参观日期</text>
+      <view class="date-grid">
+        <view
+          wx:for="{{dates}}"
+          wx:key="date"
+          class="date-cell {{item.disabled ? 'date-cell--disabled' : ''}} {{selectedDate === item.date ? 'date-cell--active' : ''}}"
+          hover-class="{{item.disabled ? 'none' : 'date-cell--hover'}}"
+          bindtap="onPickDate"
+          data-date="{{item.date}}"
+          data-disabled="{{item.disabled}}"
+        >
+          <text class="date-cell__line">{{item.week}}</text>
+          <text class="date-cell__line">{{item.disabled ? '约满' : item.date}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2. 参观时段（同样两态：默认 / 选中，单选） -->
+    <view class="card card--time">
+      <text class="card__title">参观时段</text>
+      <view class="time-row">
+        <view
+          wx:for="{{times}}"
+          wx:key="key"
+          class="time-btn {{selectedTime === item.key ? 'time-btn--active' : ''}}"
+          hover-class="time-btn--hover"
+          bindtap="onPickTime"
+          data-time="{{item.key}}"
+        >
+          <text class="time-btn__text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 游客信息 -->
+    <view class="card card--visitor">
+      <text class="card__title">游客信息</text>
+
+      <!-- 已选游客行 -->
+      <view class="visitor-row">
+        <image class="visitor-row__remove" src="/assets/icons/icon-remove.png" mode="aspectFit" aria-label="移除游客" />
+        <view class="visitor-row__info">
+          <text class="visitor-row__name">羊小咩</text>
+          <text class="visitor-row__id">441532200811256372</text>
+        </view>
+        <image class="visitor-row__more" src="/assets/icons/icon-more.png" mode="aspectFit" aria-hidden="true" />
+      </view>
+
+      <!-- 添加游客按钮 -->
+      <view class="add-btn" hover-class="add-btn--hover" bindtap="onAddVisitor">
+        <view class="add-btn__plus" aria-hidden="true" />
+        <text class="add-btn__text">添加游客（最多8人）</text>
+      </view>
+    </view>
+
+    <!-- 4. 联系方式 -->
+    <view class="card card--contact">
+      <text class="card__title">联系方式</text>
+      <view class="contact-row">
+        <text class="contact-row__text">电话号码：<text class="contact-row__num">13526674335</text></text>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- ========================================================================
+       三、提交预约按钮
+       ======================================================================== -->
+  <view class="btn-submit" hover-class="btn-submit--hover" bindtap="onSubmit">
+    <text class="btn-submit__text">提交预约</text>
+  </view>
+
+</view>

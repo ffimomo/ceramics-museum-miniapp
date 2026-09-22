@@ -28,6 +28,13 @@
   overflow: hidden;
   /* 背景兜底色：素材加载前显示，避免白屏突兀 */
   background-color: var(--bg-dark);
+  /*
+   * 退场转场已统一到公共样式：app.wxss 的 .page-fade / .page-fade--hidden
+   * ⚠️ 只做 opacity，不做位移 —— 对照设计稿录屏，启动页 → 登录页是「交叉溶解」
+   *    （登录页浮现在启动页之上，两边都停在原位），没有上滑位移。
+   * ⚠️ 启动页【不做入场淡入】：它是第一屏，应当立即出现。
+   *    所以根节点只绑 leaving，没有 entering。
+   */
 }
 
 /* ==========================================================================
@@ -120,9 +127,12 @@
 .brand {
   display: flex;
   /*
-   * flex 比例：LOGO 区占比较小（设计稿中 LOGO 紧凑贴顶，不占大块空间）
+   * flex 比例 0：LOGO 区不参与弹性分配，高度完全由内容决定。
+   * ⚠️ 早期用 1.2，把多余的纵向空间按比例塞给了这一段，导致主标题被整体下推约 100px
+   *    （设计稿标题顶在 y≈188，实现落到 y≈288）。按设计稿标注反解：
+   *    品牌区固定在顶部、弹性空间只分给「标题区 / 提示区」，比例 1.4 : 1.9。
    */
-  flex: 1.8;
+  flex: 0 0 auto;
   flex-direction: column;
   /*
    * ⚠️ 关键：LOGO 区顶部对齐，不用 center —— 设计稿中 LOGO 紧贴状态栏下方。
@@ -150,8 +160,10 @@
  */
 .brand__logo {
   display: block;
-  width: calc(23 / 430 * 100vw);
-  height: calc(30 / 430 * 100vw);
+  /* 设计稿量得 24.7 × 32.7；素材 logo.png 为 50 × 66（比例 0.758），
+     与设计稿比例 0.755 一致，按 25 × 33 呈现即可满框不变形。 */
+  width: calc(25 / 430 * 100vw);
+  height: calc(33 / 430 * 100vw);
   margin: 0 0 calc(5 / 430 * 100vw) 0;
   /* 确保与下方文字块左边缘严格齐平 */
   margin-left: 0;
@@ -159,10 +171,11 @@
 
 .brand__name-cn {
   display: block;
-  /* 中文名称：17px，宋体，字距略开 */
+  /* 中文名称：设计稿量得字高 11.6 → 字号约 12px
+     （早期误标 15px，明显偏大，会把 LOGO 区整体撑高） */
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
-  font-weight: 500;
+  font-size: calc(12 / 430 * 100vw);
+  font-weight: 400;
   line-height: 1.4;
   color: var(--text-inverse);
   letter-spacing: 0.04em;
@@ -177,7 +190,8 @@
    */
   display: block;
   font-family: var(--font-serif);
-  font-size: calc(10 / 430 * 100vw);
+  /* 设计稿量得字宽 93.0（与登录页同名文字 148.9 按比例换算）→ 字号约 11px */
+  font-size: calc(11 / 430 * 100vw);
   font-weight: 400;
   line-height: 1.5;
   color: var(--text-inverse);
@@ -195,7 +209,7 @@
    * 标题区占最大比例，内容垂直居中其内部，
    * 使标题组落在画面中部偏上位置（与设计稿一致）。
    */
-  flex: 3.0;
+  flex: 1.4;
   flex-direction: column;
   justify-content: center;
   min-height: 0;
@@ -205,30 +219,34 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-left: calc(13 / 430 * 100vw); 
+  /* 左基准：设计稿标题左边距 37.8，内容层已有 18 → 这里补 19.8 */
+  padding-left: calc(19.8 / 430 * 100vw);
 }
 
 .hero__line {
   /*
-   * 主标题单行：30px，宋体
+   * 主标题单行：设计稿量得字高 42.9、字宽 94.4（2 字）/ 180.9（4 字）
+   *   → 字号约 46px（早期按 42px，整组偏小约 10%）
    * ⚠️ 字重 400：设计稿为 regular。宋体本身的衬线笔画已足够有分量，
    *    加粗会破坏其秀气（早期误用 600，已纠正）。
+   * ⚠️ 加粗会触发思源宋体子集的「合成加粗」，抹平横细竖粗 —— 见 app.wxss 说明。
    * ⚠️ 无 text-shadow：设计图文字是干净的，不加阴影。
    *
-   * 行高 1.42 —— 宋体字面较大，行高过紧会显挤压；过松则失去「竖向排版感」
+   * 行高 1.4 —— 设计稿行距实测 63–65（46 × 1.4 = 64.4），与标注一致
    */
   display: block;
   font-family: var(--font-serif);
-  font-size: calc(42 / 430 * 100vw);
-  font-weight: 600;
-  line-height: 1.42;
+  font-size: calc(46 / 430 * 100vw);
+  font-weight: 400;
+  line-height: 1.4;
   color: var(--text-inverse);
   letter-spacing: calc(1 / 430 * 100vw);
 }
 
-/* 「遇见」与上方留出分组间距，形成 2+2 的节奏 */
+/* 「遇见」与上方留出分组间距，形成 2+2 的节奏
+   （设计稿：2→3 行距 80.6，减去常态行距 64.4 → 额外 16.2） */
 .hero__line--gap {
-  margin-top: calc(10 / 430 * 100vw);
+  margin-top: calc(16 / 430 * 100vw);
 }
 
 /* --------------------------------------------------------------------------
@@ -242,24 +260,26 @@
 }
 
 .hero__char--light {
-  font-size: calc(42 / 430 * 100vw);
-  font-weight: 600;
+  font-size: calc(46 / 430 * 100vw);
+  font-weight: 400;
   color: var(--text-inverse);
 }
 
 /* 副标题 */
 .hero__subtitle {
-  /* 12px，宋体，与主标题拉开层次 */
+  /* 设计稿量得字宽 209.2 / 14 字 → 每字约 14.9，字号约 15.5px
+     （早期 18px 偏大）*/
   display: block;
   font-family: var(--font-serif);
-  font-size: calc(18 / 430 * 100vw);
+  font-size: calc(15.5 / 430 * 100vw);
   font-weight: 400;
   line-height: 1.6;
   color: var(--text-inverse);
   letter-spacing: 0.05em;
   opacity: 0.92;
-  margin-top: calc(20 / 430 * 100vw);
-  margin-left: calc(13 / 430 * 100vw); 
+  /* 设计稿：标题块底 449.8 → 副标题行盒顶 488.3，间距 38.5 */
+  margin-top: calc(38 / 430 * 100vw);
+  margin-left: calc(19.8 / 430 * 100vw);
 }
 
 /* ==========================================================================
@@ -267,7 +287,16 @@
    ========================================================================== */
 .scroll-hint {
   display: flex;
-  flex: 1.9;
+  /*
+   * ⚠️ 弹性比例 0.9（早期 1.9）
+   * --------------------------------------------------------------------------
+   * flex: 1.4 / 1.9 时标题区分到的高度（约 330）小于其内容高度（约 336），
+   * flex 项在 min-height:0 下不会撑开，于是内容溢出、被 justify-content:center
+   * 上下各顶出一截 —— 顶部那截正好压到品牌区的「陶瓷博物馆 / Ceramics Museum」上。
+   * 按设计稿反解：标题区应分到约 474（> 内容 336，不再溢出），
+   * 对应 1.4 : 0.9 = 0.6087 的分配比。
+   */
+  flex: 0.9;
   flex-direction: column;
   /*
    * 底部提示：内容靠下对齐，接近屏幕底部
@@ -276,7 +305,11 @@
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  padding-bottom: calc(16 / 430 * 100vw);
+  /*
+   * 14 + 底部安全区 = 设计稿实测的 48（「开启文化之旅」行盒底到屏幕底）
+   * 真机上安全区 34，合计 48，与设计稿一致。
+   */
+  padding-bottom: calc(14 / 430 * 100vw);
   min-height: 0;
 }
 
@@ -358,11 +391,11 @@
   }
 }
 
-/* 底部提示文字：15px，宋体 */
+/* 底部提示文字：设计稿量得每字步进 16.7–17.4 → 字号约 15.5px */
 .scroll-hint__text {
   display: block;
   font-family: var(--font-serif);
-  font-size: calc(15 / 430 * 100vw);
+  font-size: calc(15.5 / 430 * 100vw);
   font-weight: 400;
   line-height: 1.5;
   color: var(--text-inverse);
@@ -370,8 +403,13 @@
   text-align: center;
 }
 
+/*
+ * ⚠️ 副行与主行【同字号】
+ * 设计稿中「向上滑动」与「开启文化之旅」两行字高一致（16.0 / 16.7），
+ * 早期把副行压到 13px 属于误读标注，改为与主行同号，仅降低不透明度作层次区分。
+ */
 .scroll-hint__text--sub {
-  font-size: calc(13 / 430 * 100vw);
+  font-size: calc(15.5 / 430 * 100vw);
   font-weight: 400;
   opacity: 0.85;
 }

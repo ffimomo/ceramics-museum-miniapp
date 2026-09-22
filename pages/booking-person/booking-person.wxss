@@ -1,0 +1,388 @@
+/* ==========================================================================
+   pages/booking-person/booking-person.wxss — 个人预约界面样式
+   --------------------------------------------------------------------------
+   设计稿基准：430 × 932 pt（iPhone 15 Pro） → 1px = 0.23256vw
+   单位方案：vw（与 app.wxss 约定一致）
+   色值：引用语义令牌（--text-level-1 / --brand-primary / --border-thick 等）
+
+   结构：一、导航栏 / 二、内容卡片（日期/时段/游客/联系方式）/ 三、提交按钮
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面容器
+   ========================================================================== */
+.page {
+  min-height: 100vh;
+  padding-bottom: calc(40 / 430 * 100vw);
+  background-color: var(--bg-default);
+}
+
+/* ==========================================================================
+   二、导航栏（自定义）
+   ========================================================================== */
+.navbar {
+  padding-top: var(--status-bar-h, 44px);
+}
+
+.navbar__bar {
+  position: relative;
+  height: calc(64 / 430 * 100vw);
+}
+
+.navbar__back {
+  position: absolute;
+  top: 50%;
+  left: calc(14 / 430 * 100vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(48 / 430 * 100vw);
+  height: calc(48 / 430 * 100vw);
+  transform: translateY(-50%);
+}
+
+.navbar__back--hover {
+  opacity: 0.6;
+}
+
+/* 返回箭头「‹」：内联 SVG（沿用项目「小图形用 SVG」惯例） */
+.navbar__chevron {
+  width: calc(12 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20' fill='none'%3E%3Cpath d='M9 2 L3 10 L9 18' stroke='%232f2923' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.navbar__title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-size: calc(24 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* ==========================================================================
+   三、内容区（368px 宽，居中）
+   ========================================================================== */
+.content {
+  width: calc(368 / 430 * 100vw);
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   卡片通用：白色底；标题 24px 宋体（设计稿为纯黑，统一归一到一级文字色）
+   -------------------------------------------------------------------------- */
+.card {
+  position: relative;
+  background-color: var(--bg-white);
+}
+
+.card__title {
+  position: absolute;
+  top: calc(20 / 430 * 100vw);
+  left: calc(19 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(24 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+.card + .card {
+  margin-top: calc(12 / 430 * 100vw);
+}
+
+/* ==========================================================================
+   四、参观日期卡片（368 × 246，带边框 + 阴影）
+   ========================================================================== */
+.card--date {
+  height: calc(246 / 430 * 100vw);
+  border: 1px solid var(--border-thick);
+  border-radius: calc(10 / 430 * 100vw);
+  box-shadow: 0 0 calc(6 / 430 * 100vw) 0 var(--border-default);
+}
+
+/* 周历网格：3 列，等距分布 */
+.date-grid {
+  position: absolute;
+  top: calc(80 / 430 * 100vw);
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: calc(18 / 430 * 100vw);
+  padding-left: calc(18 / 430 * 100vw);
+}
+
+.date-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100 / 430 * 100vw);
+  padding: calc(9 / 430 * 100vw) 0;
+  margin-bottom: calc(20 / 430 * 100vw);
+  background-color: var(--bg-default);
+  border: 1px solid var(--brand-secondary);
+  border-radius: calc(10 / 430 * 100vw);
+}
+
+.date-cell--hover {
+  opacity: 0.7;
+}
+
+/* 已约满（禁用）日期 */
+/*
+ * 约满（禁用）：灰底、去掉描边、不响应点击
+ * 设计稿实测底色 #d5d5d5，且没有描边（按钮设计稿组 1 中间一行）
+ */
+.date-cell--disabled {
+  background-color: #d5d5d5;
+  border-color: transparent;
+}
+
+/*
+ * 选中态：品牌主色实底 + 白字（按钮设计稿组 1 下行）
+ * 单选由 JS 的 selectedDate 单一数据源保证，这里只负责表现。
+ */
+.date-cell--active {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.date-cell--active .date-cell__line {
+  color: var(--text-inverse);
+}
+
+.date-cell__line {
+  font-family: var(--font-serif);
+  font-size: calc(18 / 430 * 100vw);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   五、参观时段卡片（368 × 120，带边框 + 阴影）
+   ========================================================================== */
+.card--time {
+  height: calc(120 / 430 * 100vw);
+  border: 1px solid var(--border-thick);
+  border-radius: calc(10 / 430 * 100vw);
+  box-shadow: 0 0 calc(6 / 430 * 100vw) 0 var(--border-default);
+}
+
+.card--time .card__title {
+  top: calc(16 / 430 * 100vw);
+}
+
+.time-row {
+  position: absolute;
+  top: calc(60 / 430 * 100vw);
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: calc(19 / 430 * 100vw);
+  padding-left: calc(19 / 430 * 100vw);
+}
+
+.time-btn {
+  display: flex;
+  align-items: center;
+  /*
+   * 文字在框内居中
+   * ------------------------------------------------------------------
+   * 设计稿实测：按钮内文字左右留白 36 / 37（按钮设计稿「按钮.png」组 2），
+   * 即水平居中。早期是 flex-start + 左内边距 13，文字贴着左边。
+   */
+  justify-content: center;
+  width: calc(155 / 430 * 100vw);
+  height: calc(42 / 430 * 100vw);
+  background-color: var(--bg-default);
+  border: 1px solid var(--brand-secondary);
+  border-radius: calc(10 / 430 * 100vw);
+}
+
+/* 选中态：品牌主色实底 + 白字（按钮设计稿组 2 下行） */
+.time-btn--active {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.time-btn--active .time-btn__text {
+  color: var(--text-inverse);
+}
+
+.time-btn--hover {
+  opacity: 0.7;
+}
+
+.time-btn__text {
+  font-family: var(--font-serif);
+  font-size: calc(16 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   六、游客信息卡片（368 × 204，无边框）
+   ========================================================================== */
+.card--visitor {
+  height: calc(204 / 430 * 100vw);
+  border-radius: calc(10 / 430 * 100vw);
+}
+
+.card--visitor .card__title {
+  top: calc(12 / 430 * 100vw);
+  left: calc(21 / 430 * 100vw);
+}
+
+/* 已选游客行（浅杏高亮条） */
+.visitor-row {
+  position: absolute;
+  top: calc(60 / 430 * 100vw);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  width: calc(331 / 430 * 100vw);
+  height: calc(64 / 430 * 100vw);
+  padding: 0 calc(16 / 430 * 100vw);
+  transform: translateX(-50%);
+  background-color: rgba(200, 179, 155, 0.3);
+}
+
+.visitor-row__remove {
+  width: calc(20 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  margin-right: calc(16 / 430 * 100vw);
+}
+
+.visitor-row__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.visitor-row__name {
+  font-family: var(--font-sans);
+  font-size: calc(16 / 430 * 100vw);
+  line-height: 1.2;
+  color: var(--text-level-2);
+}
+
+.visitor-row__id {
+  font-family: var(--font-sans);
+  font-size: calc(16 / 430 * 100vw);
+  line-height: 1.2;
+  color: rgba(124, 115, 104, 0.5);
+}
+
+.visitor-row__more {
+  width: calc(19 / 430 * 100vw);
+  height: calc(19 / 430 * 100vw);
+}
+
+/* 添加游客按钮（胶囊，虚线感边框） */
+.add-btn {
+  position: absolute;
+  top: calc(140 / 430 * 100vw);
+  left: calc(21 / 430 * 100vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(326 / 430 * 100vw);
+  height: calc(52 / 430 * 100vw);
+  border: 1px solid var(--brand-secondary);
+  border-radius: calc(30 / 430 * 100vw);
+}
+
+.add-btn--hover {
+  opacity: 0.7;
+}
+
+/* 加号「＋」：内联 SVG */
+.add-btn__plus {
+  width: calc(18 / 430 * 100vw);
+  height: calc(18 / 430 * 100vw);
+  margin-right: calc(6 / 430 * 100vw);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 3 V17 M3 10 H17' stroke='%237c7368' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.add-btn__text {
+  font-family: var(--font-serif);
+  font-size: calc(19 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* ==========================================================================
+   七、联系方式卡片（368 × 120，无边框，圆角 2）
+   ========================================================================== */
+.card--contact {
+  height: calc(120 / 430 * 100vw);
+  border-radius: calc(2 / 430 * 100vw);
+}
+
+.card--contact .card__title {
+  top: calc(6 / 430 * 100vw);
+  left: calc(27 / 430 * 100vw);
+}
+
+.contact-row {
+  position: absolute;
+  top: calc(50 / 430 * 100vw);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  width: calc(325 / 430 * 100vw);
+  height: calc(60 / 430 * 100vw);
+  padding: 0 calc(14 / 430 * 100vw);
+  transform: translateX(-50%);
+  background-color: rgba(200, 179, 155, 0.3);
+}
+
+.contact-row__text {
+  font-family: var(--font-serif);
+  font-size: calc(19 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* 手机号：品牌主色高亮 */
+.contact-row__num {
+  color: var(--brand-primary);
+}
+
+/* ==========================================================================
+   八、提交预约按钮（品牌主色 CTA，380 × 60，圆角 15）
+   ========================================================================== */
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(380 / 430 * 100vw);
+  height: calc(60 / 430 * 100vw);
+  margin: 0 auto;
+  background-color: var(--brand-primary);
+  border-radius: calc(15 / 430 * 100vw);
+}
+
+.btn-submit--hover {
+  opacity: 0.85;
+}
+
+.btn-submit__text {
+  font-family: var(--font-sans);
+  font-weight: 500; /* 设计稿：PingFang SC Medium */
+  font-size: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-inverse);
+}

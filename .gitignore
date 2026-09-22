@@ -33,3 +33,6 @@ tools/_*.txt
 #    微信开发者工具默认会打包整个 assets 目录，
 #    如需彻底排除需在 project.config.json 里配置 packOptions.ignore
 assets/_originals_png/
+
+# 微信开发者工具个人配置（每人不同，不入库）
+project.private.config.json

@@ -1,0 +1,256 @@
+<!-- ==========================================================================
+     pages/guide/guide.wxml — 馆内导览
+     --------------------------------------------------------------------------
+     设计稿：Figma「导览页1」（node 33-162），基准 430 × 932（iPhone 15 Pro）
+     结构（自上而下）：
+       一、导航栏（标题「馆内导览」，自定义导航，避开状态栏）
+       二、楼层切换（遮罩 + 1F–4F 楼层面板 + 展开/收起悬浮按钮）
+       三、滚动内容区（scroll-view）
+           1. 馆内地图
+           2. 快捷入口（找文物 / 找卫生间 / 找饮水间 / 票务中心）
+           3. 热门文物（区块标题 + 3 张文物卡）
+           4. 查看更多按钮
+       四、底部导航（首页 / 导览〔激活〕 / 鉴赏 / 我的，自定义 TabBar）
+
+     ⚠️ 图片 / 图标：
+       图片位于 /img/，图标位于 /assets/icons/，均为绝对路径。
+       地图与文物图按设计稿比例铺满（scaleToFill），图标等比缩放（aspectFit）。
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、导航栏
+       ------------------------------------------------------------------------
+       navigationStyle: custom，顶部由 JS 注入 --status-bar-h 避开状态栏；
+       标题「馆内导览」24px 居中。
+       ======================================================================== -->
+  <view class="navbar">
+    <view class="navbar__bar">
+      <text class="navbar__title">馆内导览</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       二、楼层切换（遮罩 + 楼层面板 + 悬浮按钮）
+       ------------------------------------------------------------------------
+       收起态（导览页1）：仅导航栏下沿左侧的 46×72 悬浮按钮，箭头 ››。
+       展开态（导览页2）：左侧浮出 96×330 楼层面板（1F–4F），按钮右移到面板
+                          右侧并翻转为 ‹‹，同时全屏压暗遮罩（含底部导航）。
+       ======================================================================== -->
+
+  <!-- 遮罩：压暗整页，点击收起 -->
+  <view class="floor-mask" wx:if="{{floorOpen}}" bindtap="onFloorToggle" aria-hidden="true" />
+
+  <!-- 楼层面板：1F–4F 四等分，当前楼层高亮 -->
+  <view class="floor-panel" wx:if="{{floorOpen}}">
+    <view class="floor-panel__list">
+      <view class="floor-panel__item {{floor === 1 ? 'floor-panel__item--active' : ''}}" hover-class="floor-panel__item--hover" bindtap="onFloorTap" data-floor="1">1F</view>
+      <view class="floor-panel__item {{floor === 2 ? 'floor-panel__item--active' : ''}}" hover-class="floor-panel__item--hover" bindtap="onFloorTap" data-floor="2">2F</view>
+      <view class="floor-panel__item {{floor === 3 ? 'floor-panel__item--active' : ''}}" hover-class="floor-panel__item--hover" bindtap="onFloorTap" data-floor="3">3F</view>
+      <view class="floor-panel__item {{floor === 4 ? 'floor-panel__item--active' : ''}}" hover-class="floor-panel__item--hover" bindtap="onFloorTap" data-floor="4">4F</view>
+    </view>
+  </view>
+
+  <!-- 悬浮按钮：展开 / 收起楼层 -->
+  <view
+    class="side-entry {{floorOpen ? 'side-entry--open' : ''}}"
+    hover-class="side-entry--hover"
+    bindtap="onFloorToggle"
+    aria-label="{{floorOpen ? '收起楼层' : '展开楼层'}}"
+  >
+    <image
+      class="side-entry__icon"
+      src="{{floorOpen ? '/assets/icons/icon-guide-chevrons-left.png' : '/assets/icons/icon-guide-chevrons.png'}}"
+      mode="aspectFit"
+      aria-hidden="true"
+    />
+  </view>
+
+  <!-- ========================================================================
+       三、滚动内容区
+       ------------------------------------------------------------------------
+       左右各 14px 安全边距（宽 402），顶部距导航栏下沿 11px，纵向滚动。
+       ======================================================================== -->
+  <scroll-view class="scroll" scroll-y>
+    <view class="scroll__inner">
+
+      <!-- --------------------------------------------------------------------
+           1. 馆内地图（376 × 465）
+           -------------------------------------------------------------------- -->
+      <view class="guide-map">
+        <image class="guide-map__img" src="/img/guide-map.jpg" mode="scaleToFill" aria-hidden="true" />
+      </view>
+
+      <!-- --------------------------------------------------------------------
+           2. 快捷入口（376 × 68 描边圆角条，4 个入口等距）
+           -------------------------------------------------------------------- -->
+      <view class="quick">
+        <view class="quick__list">
+
+          <!-- 找文物 -->
+          <view class="quick__item" hover-class="quick__item--hover" bindtap="onQuickTap" data-name="找文物">
+            <view class="quick__circle">
+              <image class="quick__icon quick__icon--locate" src="/assets/icons/icon-guide-locate.png" mode="aspectFit" aria-hidden="true" />
+            </view>
+            <text class="quick__label">找文物</text>
+          </view>
+
+          <!-- 找卫生间 -->
+          <view class="quick__item" hover-class="quick__item--hover" bindtap="onQuickTap" data-name="找卫生间">
+            <view class="quick__circle">
+              <image class="quick__icon quick__icon--toilet" src="/assets/icons/icon-guide-toilet.png" mode="aspectFit" aria-hidden="true" />
+            </view>
+            <text class="quick__label">找卫生间</text>
+          </view>
+
+          <!-- 找饮水间 -->
+          <view class="quick__item" hover-class="quick__item--hover" bindtap="onQuickTap" data-name="找饮水间">
+            <view class="quick__circle">
+              <image class="quick__icon quick__icon--water" src="/assets/icons/icon-guide-water.png" mode="aspectFit" aria-hidden="true" />
+            </view>
+            <text class="quick__label">找饮水间</text>
+          </view>
+
+          <!-- 票务中心 -->
+          <view class="quick__item" hover-class="quick__item--hover" bindtap="onQuickTap" data-name="票务中心">
+            <view class="quick__circle">
+              <image class="quick__icon quick__icon--ticket" src="/assets/icons/icon-guide-ticket.png" mode="aspectFit" aria-hidden="true" />
+            </view>
+            <text class="quick__label">票务中心</text>
+          </view>
+
+        </view>
+      </view>
+
+      <!-- --------------------------------------------------------------------
+           3. 热门文物（402 宽描边圆角卡：区块标题 + 3 张文物卡）
+           -------------------------------------------------------------------- -->
+      <view class="relics">
+
+        <!-- 3.1 区块标题 -->
+        <view class="relics__head">
+          <image class="relics__head-icon" src="/assets/icons/icon-guide-relic.png" mode="aspectFit" aria-hidden="true" />
+          <text class="relics__head-title">热门文物</text>
+        </view>
+
+        <!-- 3.2 文物卡（351 × 128：左侧文物图 + 右侧排名 / 年代 / 展厅 / 排队时长） -->
+
+        <!-- 文物卡 1 -->
+        <view class="relic-card" hover-class="relic-card--hover" bindtap="onRelicTap" data-id="1">
+          <view class="relic-card__pic">
+            <image class="relic-card__img" src="/img/relic-1.jpg" mode="scaleToFill" aria-hidden="true" />
+          </view>
+          <view class="relic-card__info">
+            <view class="relic-card__row">
+              <view class="relic-card__rank"><text class="relic-card__rank-num">1</text></view>
+              <text class="relic-card__name">仰韶文化彩陶</text>
+            </view>
+            <view class="relic-card__meta">
+              <text class="relic-card__meta-line">新石器时期</text>
+              <text class="relic-card__meta-line">展厅：新石器陶器展区</text>
+            </view>
+            <view class="relic-card__queue">
+              <image class="relic-card__queue-icon" src="/assets/icons/icon-guide-queue.png" mode="aspectFit" aria-hidden="true" />
+              <text class="relic-card__queue-text"><text class="relic-card__queue-unit">排队约 </text>10 <text class="relic-card__queue-unit">min</text></text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 文物卡 2 -->
+        <view class="relic-card" hover-class="relic-card--hover" bindtap="onRelicTap" data-id="2">
+          <view class="relic-card__pic">
+            <image class="relic-card__img" src="/img/relic-2.jpg" mode="scaleToFill" aria-hidden="true" />
+          </view>
+          <view class="relic-card__info">
+            <view class="relic-card__row">
+              <view class="relic-card__rank"><text class="relic-card__rank-num">2</text></view>
+              <text class="relic-card__name">元釉青花瓷</text>
+            </view>
+            <view class="relic-card__meta">
+              <text class="relic-card__meta-line">元代</text>
+              <text class="relic-card__meta-line">展厅：元代青花展区</text>
+            </view>
+            <view class="relic-card__queue">
+              <image class="relic-card__queue-icon" src="/assets/icons/icon-guide-queue.png" mode="aspectFit" aria-hidden="true" />
+              <text class="relic-card__queue-text"><text class="relic-card__queue-unit">排队约 </text>15 <text class="relic-card__queue-unit">min</text></text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 文物卡 3 -->
+        <view class="relic-card" hover-class="relic-card--hover" bindtap="onRelicTap" data-id="3">
+          <view class="relic-card__pic">
+            <image class="relic-card__img" src="/img/relic-3.jpg" mode="scaleToFill" aria-hidden="true" />
+          </view>
+          <view class="relic-card__info">
+            <view class="relic-card__row">
+              <view class="relic-card__rank"><text class="relic-card__rank-num">3</text></view>
+              <text class="relic-card__name">乾隆粉地料彩缠枝莲芳</text>
+            </view>
+            <view class="relic-card__meta">
+              <text class="relic-card__meta-line">清代</text>
+              <text class="relic-card__meta-line">展厅：明清彩瓷展区</text>
+            </view>
+            <view class="relic-card__queue">
+              <image class="relic-card__queue-icon" src="/assets/icons/icon-guide-queue.png" mode="aspectFit" aria-hidden="true" />
+              <text class="relic-card__queue-text"><text class="relic-card__queue-unit">排队约 </text>5 <text class="relic-card__queue-unit">min</text></text>
+            </view>
+          </view>
+        </view>
+
+        <!-- ------------------------------------------------------------------
+             3.4 查看更多按钮（166 × 42，品牌辅助色填充）
+             ------------------------------------------------------------------
+             ⚠️ 按新版设计稿，「查看更多」在「热门文物」大框【内部】，
+                不是框外的独立元素 —— 外框的描边要把它一起包住。
+                早期版本把它放在 .relics 之后，框底边会切在按钮上方。
+             ------------------------------------------------------------------ -->
+        <view class="more" hover-class="more--hover" bindtap="onMoreTap" aria-label="查看更多">
+          <text class="more__text">查看更多</text>
+        </view>
+
+      </view>
+      <!-- 热门文物框结束 -->
+
+    </view>
+  </scroll-view>
+
+  <!-- ========================================================================
+       四、底部导航（自定义 TabBar）
+       ------------------------------------------------------------------------
+       固定底部。导览为当前激活态（深色 icon + 一级文字 + Medium 字重）。
+       ======================================================================== -->
+  <view class="tabbar">
+    <view class="tabbar__list">
+
+      <!-- 首页 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="index">
+        <image class="tabbar__icon" src="/assets/icons/tab-home.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">首页</text>
+      </view>
+
+      <!-- 导览（激活）
+           ⚠️ 图标颜色画在 PNG 里，激活/未激活是两套素材：
+              tab-{name}.png（浅暖灰） / tab-{name}-active.png（深棕）
+              切换激活项时必须换 src，不能只加类名。 -->
+      <view class="tabbar__item tabbar__item--active" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="guide">
+        <image class="tabbar__icon" src="/assets/icons/tab-guide-active.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">导览</text>
+      </view>
+
+      <!-- 鉴赏 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="appreciate">
+        <image class="tabbar__icon" src="/assets/icons/tab-appreciate.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">鉴赏</text>
+      </view>
+
+      <!-- 我的 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="mine">
+        <image class="tabbar__icon" src="/assets/icons/tab-mine.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">我的</text>
+      </view>
+
+    </view>
+  </view>
+
+</view>

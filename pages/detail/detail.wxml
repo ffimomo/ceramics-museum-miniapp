@@ -1,11 +1,131 @@
-<!--pages/detail/detail.wxml — 详情页
-  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
--->
-<view class="page">
+<!-- ==========================================================================
+     pages/detail/detail.wxml — 文物详情页
+     --------------------------------------------------------------------------
+     设计稿：Figma node 41-110（430 × 932，@2x 导出）
+     入口：导览页「热门文物」第 3 张卡（guide.wxml 的 陶瓷文物 卡，data-id="3"）
 
-  <!-- 详情内容挂载点 -->
-  <view class="main">
-    <!-- TODO: 详情内容待按设计稿实现 -->
+     结构（自上而下）：
+       一、文物大图（430 × 480，底边被内容面板压住 28）
+             └ 3D 视图入口（右下角深色胶囊，叠在图上）
+       二、内容面板（顶部 20 圆角，上压大图）
+            2.1 名称（32px 宋体）+ 语音播放按钮（40 × 40 圆形）
+            2.2 朝代（18px 二级文字）
+            2.3 描述段落（18px 二级文字，行高 22）
+            2.4 属性表（类别 / 等级 / 尺寸 / 用途，16px，行距 30）
+            2.5 语言切换（中文 / English / français / 日本語，88 × 40 描边按钮）
+
+     ⚠️ 尺寸换算：设计稿 430 宽 → 统一写 calc(N / 430 * 100vw)
+     ⚠️ 色值一律引用 app.wxss 语义令牌（唯一例外见 .attrs__row 的说明）
+     ⚠️ 资源：/img/relic-detail.jpg、/assets/icons/icon-relic-3d.png、icon-relic-play.png
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、文物大图
+       ------------------------------------------------------------------------
+       设计稿：图框 430 × 480；内容面板从 y=452 起上压，
+              露出上方 452 是照片本体、452~480 这一段只用来填面板圆角缺口。
+       ======================================================================== -->
+  <view class="hero">
+    <image class="hero__img" src="/img/relic-detail.jpg" mode="aspectFill" aria-hidden="true" />
+
+    <!-- ----------------------------------------------------------------------
+         返回按钮
+         ----------------------------------------------------------------------
+         设计稿里没有（设计稿只画了内容），按需求补一个，样式与「票务预约」页
+         左上角的返回键完全一致（48 × 48 点击区、12 × 20 圆头折线、同一色值）。
+         位置：状态栏下方、左边距 12、在 64 高的导航条里垂直居中。
+         ⚠️ 本页是 navigationStyle: custom，返回键要自己画。
+         ---------------------------------------------------------------------- -->
+    <view class="back" hover-class="back--hover" bindtap="onBack" aria-label="返回">
+      <view class="back__chevron" aria-hidden="true" />
+    </view>
+
+    <!-- 3D 视图入口：设计稿 (309,392) 100 × 40，圆角 20，半透黑底 -->
+    <view class="badge3d" hover-class="badge3d--hover" bindtap="on3DView" aria-label="查看3D视图">
+      <image class="badge3d__icon" src="/assets/icons/icon-relic-3d.png" mode="aspectFit" aria-hidden="true" />
+      <text class="badge3d__text">3D视图</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       二、内容面板
+       ======================================================================== -->
+  <view class="panel">
+
+    <!-- ----------------------------------------------------------------------
+         2.1 名称 + 语音播放
+         ----------------------------------------------------------------------
+         设计稿：行盒顶 495、高 40；名称 32px 宋体一级文字左起 33.5；
+                播放按钮 40 × 40 位于 x=374（右边距 16）。
+         ---------------------------------------------------------------------- -->
+    <view class="head">
+      <text class="head__title">{{relic.name}}</text>
+      <view class="head__play" hover-class="head__play--hover" bindtap="onPlay" aria-label="语音讲解">
+        <image class="head__play-icon" src="/assets/icons/icon-relic-play.png" mode="aspectFit" aria-hidden="true" />
+      </view>
+    </view>
+
+    <!-- 2.2 朝代：设计稿行盒顶 545.4，18px 二级文字 -->
+    <text class="dynasty">{{relic.dynasty}}</text>
+
+    <!-- 2.3 描述：设计稿行盒顶 585.9，18px / 行高 22 -->
+    <text class="desc">{{relic.desc}}</text>
+
+    <!-- ----------------------------------------------------------------------
+         2.4 属性表
+         ----------------------------------------------------------------------
+         设计稿：首行行盒顶 701，四行行距 30；16px。
+         ⚠️ 字色 #a19990 不在 app.wxss 的令牌表里（比二级文字浅），按设计稿原值写。
+         ---------------------------------------------------------------------- -->
+    <view class="attrs">
+      <view class="attrs__row">
+        <text class="attrs__k">类别：</text><text class="attrs__v">{{relic.category}}</text>
+      </view>
+      <view class="attrs__row">
+        <text class="attrs__k">等级：</text><text class="attrs__v">{{relic.level}}</text>
+      </view>
+      <view class="attrs__row">
+        <text class="attrs__k">尺寸：</text><text class="attrs__v">{{relic.size}}</text>
+      </view>
+      <view class="attrs__row">
+        <text class="attrs__k">用途：</text><text class="attrs__v">{{relic.usage}}</text>
+      </view>
+    </view>
+
+    <!-- ----------------------------------------------------------------------
+         2.5 语言切换
+         ----------------------------------------------------------------------
+         设计稿：四个 88 × 40 描边按钮，左起 21、间距 12.5、圆角约 12。
+                选中态：主色描边 + 一级文字；未选中：辅助色描边 + 二级文字。
+         ---------------------------------------------------------------------- -->
+    <view class="langs">
+      <view
+        class="lang {{currentLang === 'zh' ? 'lang--on' : ''}}"
+        hover-class="lang--hover"
+        bindtap="onLangTap"
+        data-lang="zh"
+      >中文</view>
+      <view
+        class="lang {{currentLang === 'en' ? 'lang--on' : ''}}"
+        hover-class="lang--hover"
+        bindtap="onLangTap"
+        data-lang="en"
+      >English</view>
+      <view
+        class="lang {{currentLang === 'fr' ? 'lang--on' : ''}}"
+        hover-class="lang--hover"
+        bindtap="onLangTap"
+        data-lang="fr"
+      >français</view>
+      <view
+        class="lang {{currentLang === 'ja' ? 'lang--on' : ''}}"
+        hover-class="lang--hover"
+        bindtap="onLangTap"
+        data-lang="ja"
+      >日本語</view>
+    </view>
+
   </view>
 
 </view>

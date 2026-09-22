@@ -2,7 +2,14 @@
   "pages": [
     "pages/splash/splash",
     "pages/login/login",
-    "pages/index/index"
+    "pages/index/index",
+    "pages/guide/guide",
+    "pages/appreciate/appreciate",
+    "pages/list/list",
+    "pages/detail/detail",
+    "pages/mine/mine",
+    "pages/booking/booking",
+    "pages/booking-person/booking-person"
   ],
   "window": {
     "backgroundTextStyle": "dark",

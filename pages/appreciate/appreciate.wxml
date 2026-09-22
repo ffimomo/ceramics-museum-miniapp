@@ -1,0 +1,133 @@
+<!-- ==========================================================================
+     pages/appreciate/appreciate.wxml — 鉴赏页
+     --------------------------------------------------------------------------
+     设计稿：Figma「鉴赏页」（node 61:121），基准 430 × 932（iPhone 15 Pro）
+
+     结构（自上而下）：
+       一、渐变背景层（430 × 864，底栏以上整块）
+       二、导航栏（标题「赏文物」26px 居中 + 右上搜索图标 24×24）
+       三、分类「陶 | 瓷」（22px，字距 12，陶=一级文字 / |瓷=二级文字）
+       四、展品舞台（430 × 573 主图 + 左右切换箭头 14.456 × 26.228）
+       五、展品说明（名称 28px 字距 12 + 描述 18px 字距 1.8）
+       六、底部导航（首页 / 导览 / 鉴赏〔激活〕 / 我的，自定义 TabBar）
+
+     ⚠️ 尺寸换算：设计稿 430 宽 → 统一写 calc(N / 430 * 100vw)
+     ⚠️ 色值一律引用 app.wxss 语义令牌，不写裸色值
+     ⚠️ 图片 / 图标：
+          主图   /img/appreciate-relic.png        （设计稿导出，含透明通道的抠图）
+          图标   /assets/icons/icon-appreciate-*.png
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、背景层
+       ------------------------------------------------------------------------
+       设计稿：430 × 864，156.25° 三段渐变（辅助色 → 白 → 主色）。
+       只铺到 y=864（底栏上沿），下方由底栏自己的白底接管。
+
+       背景由两层叠成：
+         .bg       渐变本体（另叠了一层 9% 黑，对齐设计稿的整体明度）
+         .bg__grain 颗粒纹理（设计稿渐变层带「噪点」填充，
+                    代码导出不会带出来，这里用一张平铺的灰度噪点图还原）
+       ======================================================================== -->
+  <view class="bg" aria-hidden="true" />
+  <view class="bg__grain" aria-hidden="true" />
+
+  <!-- ========================================================================
+       二、导航栏
+       ------------------------------------------------------------------------
+       navigationStyle: custom，顶部由 appreciate.js 注入 --status-bar-h 避开状态栏。
+       导航栏本体 52 高，距状态栏下沿 21（设计稿 y=75）。
+       标题与搜索图标均在该条内垂直居中。
+       ======================================================================== -->
+  <view class="navbar">
+    <text class="navbar__title">赏文物</text>
+
+    <!-- 搜索入口（设计稿 x=376, y=89, 24×24；即条内右对齐、右边距 30） -->
+    <view class="navbar__search" hover-class="navbar__search--hover" bindtap="onSearch" aria-label="搜索">
+      <image class="navbar__icon" src="/assets/icons/icon-appreciate-search.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       三、分类「陶 | 瓷」
+       ------------------------------------------------------------------------
+       设计稿：居中，y=158，22px，行高 24，字距 12。
+       两段不同色：「陶」用一级文字，「|瓷」用二级文字（设计稿即如此拆分）。
+       ======================================================================== -->
+  <view class="category">
+    <text class="category__on">陶</text><text class="category__off">|瓷</text>
+  </view>
+
+  <!-- ========================================================================
+       四、展品舞台
+       ------------------------------------------------------------------------
+       设计稿：430 × 573 主图，水平居中、顶边 y=126（= 竖向中心 412.5）。
+       左右箭头 14.456 × 26.228，纵向 y=418（舞台内 292），横向距边 12。
+       ======================================================================== -->
+  <view class="stage">
+    <image class="stage__img" src="/img/appreciate-relic.png" mode="aspectFit" aria-hidden="true" />
+
+    <!-- 上一件 -->
+    <view class="stage__nav stage__nav--prev" hover-class="stage__nav--hover" bindtap="onPrev" aria-label="上一件">
+      <image class="stage__nav-icon" src="/assets/icons/icon-appreciate-prev.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+
+    <!-- 下一件 -->
+    <view class="stage__nav stage__nav--next" hover-class="stage__nav--hover" bindtap="onNext" aria-label="下一件">
+      <image class="stage__nav-icon" src="/assets/icons/icon-appreciate-next.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       五、展品说明
+       ------------------------------------------------------------------------
+       设计稿：名称 y=695（28px / 行高 22 / 字距 12），
+              描述 y=749（18px / 行高 24 / 字距 1.8），
+              两者行盒间距 749 - (695+22) = 32。
+       ======================================================================== -->
+  <view class="caption">
+    <text class="caption__title">宋·青白釉托盏</text>
+    <text class="caption__desc">雨过天青，釉色温润如玉</text>
+  </view>
+
+  <!-- ========================================================================
+       六、底部导航（自定义 TabBar）
+       ------------------------------------------------------------------------
+       样式来自 styles/tabbar.wxss（与首页 / 导览页共用，位置与图标尺寸完全一致）。
+       本页为「鉴赏」激活态：图标换 -active 深色素材，文字换一级文字 + Medium。
+       ======================================================================== -->
+  <view class="tabbar">
+    <view class="tabbar__list">
+
+      <!-- 首页 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="index">
+        <image class="tabbar__icon" src="/assets/icons/tab-home.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">首页</text>
+      </view>
+
+      <!-- 导览 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="guide">
+        <image class="tabbar__icon" src="/assets/icons/tab-guide.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">导览</text>
+      </view>
+
+      <!-- 鉴赏（激活）
+           ⚠️ 图标颜色画在 PNG 里，激活/未激活是两套素材：
+              tab-{name}.png（浅暖灰） / tab-{name}-active.png（深棕）
+              切换激活项时必须换 src，不能只加类名。 -->
+      <view class="tabbar__item tabbar__item--active" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="appreciate">
+        <image class="tabbar__icon" src="/assets/icons/tab-appreciate-active.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">鉴赏</text>
+      </view>
+
+      <!-- 我的 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="mine">
+        <image class="tabbar__icon" src="/assets/icons/tab-mine.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">我的</text>
+      </view>
+
+    </view>
+  </view>
+
+</view>

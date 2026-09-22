@@ -1,16 +1,202 @@
-<!--pages/mine/mine.wxml — 我的
-  ⚠️ 骨架占位：不含任何界面实现，仅保留语义化结构挂载点。
--->
-<view class="page">
+<!-- ==========================================================================
+     pages/mine/mine.wxml — 我的（个人信息页）
+     --------------------------------------------------------------------------
+     设计稿：Figma「个人信息页」（node 65:268），基准 430 × 932（iPhone 15 Pro）
 
-  <!-- 用户信息区挂载点 -->
-  <view class="profile">
-    <!-- TODO: 用户信息待按设计稿实现 -->
+     结构（自上而下）：
+       一、顶部背景图（430 × 360，整幅底对齐）
+       二、设置入口（右上角齿轮 24 × 24）
+       三、用户信息（头像 86 × 86 + 昵称 + 欢迎语，白色文字压在背景图上）
+       四、内容面板（顶部 32 圆角，上压在背景图上）— 与首页内容卡同一手法
+            4.1 我的订单（标题 + 全部订单入口 + 4 个订单状态）
+            4.2 功能菜单（我的预约 / 我的讲解 / 我的消息 / 帮助与反馈）
+       五、底部导航（首页 / 导览 / 鉴赏 / 我的〔激活〕）
+
+     ⚠️ 尺寸换算：设计稿 430 宽 → 统一写 calc(N / 430 * 100vw)
+     ⚠️ 色值一律引用 app.wxss 语义令牌
+     ⚠️ 资源：
+          图片  /img/mine-header.jpg、/img/mine-avatar.png
+          图标  /assets/icons/icon-mine-*.png、icon-chevron-right.png
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}">
+
+  <!-- ========================================================================
+       一、顶部背景图
+       ------------------------------------------------------------------------
+       设计稿：430 × 360 的图框，原图 577 × 1024 按 cover 铺满、【底边对齐】
+              （object-fit: cover + object-position: bottom）。
+       小程序 image 组件没有 object-position，所以这里显式算出 cover 后的尺寸
+       （430 × 763.1），再用 bottom: 0 贴底、由外层裁掉上方多出来的部分。
+       ======================================================================== -->
+  <view class="hero">
+    <image class="hero__img" src="/img/mine-header.jpg" mode="aspectFill" aria-hidden="true" />
   </view>
 
-  <!-- 功能入口区挂载点 -->
-  <view class="main">
-    <!-- TODO: 功能列表待按设计稿实现 -->
+  <!-- ========================================================================
+       二、设置入口
+       ------------------------------------------------------------------------
+       设计稿：右上角齿轮，24 × 24，距顶 78、距右 37。
+       ======================================================================== -->
+  <view class="settings" hover-class="settings--hover" bindtap="onSettings" aria-label="设置">
+    <image class="settings__icon" src="/assets/icons/icon-mine-settings.png" mode="aspectFit" aria-hidden="true" />
+  </view>
+
+  <!-- ========================================================================
+       三、用户信息
+       ------------------------------------------------------------------------
+       设计稿：头像 86 × 86 位于 (38, 110)；文字整体左起 x=148（含间距 24）：
+                昵称「青草小羊」  24px 白色，行盒顶 126
+                欢迎语            16px 白色，行盒顶 164
+       ======================================================================== -->
+  <view class="profile">
+    <image class="profile__avatar" src="/img/mine-avatar.png" mode="aspectFit" aria-label="头像" />
+    <view class="profile__text">
+      <text class="profile__name">青草小羊</text>
+      <text class="profile__desc">欢迎来到陶瓷博物馆</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       四、内容面板（顶部 32 圆角，上压背景图 118 —— 面板顶 242、图底 360）
+       ======================================================================== -->
+  <view class="panel">
+
+    <!-- ----------------------------------------------------------------------
+         4.1 我的订单
+         ----------------------------------------------------------------------
+         设计稿：区块 242 → 422（高 180）。
+               标题「我的订单」20px Medium，左 36、行盒顶 276
+               「全部订单」16px 二级文字，右侧；其后接 ›
+               四个订单状态居中排列：间距 56，单项宽 42，图标 42 × 42 + 8 + 13px 文字
+         ---------------------------------------------------------------------- -->
+    <view class="orders">
+
+      <!-- 区块头 -->
+      <view class="orders__head">
+        <text class="orders__title">我的订单</text>
+        <view class="orders__all" hover-class="orders__all--hover" bindtap="onAllOrders">
+          <text class="orders__all-text">全部订单</text>
+          <image class="chevron" src="/assets/icons/icon-chevron-right.png" mode="aspectFit" aria-hidden="true" />
+        </view>
+      </view>
+
+      <!-- 四个订单状态 -->
+      <view class="orders__items">
+
+        <!-- 待付款 -->
+        <view class="order" hover-class="order--hover" bindtap="onOrderTap" data-status="待付款">
+          <image class="order__icon" src="/assets/icons/icon-mine-order-pending.png" mode="aspectFit" aria-hidden="true" />
+          <text class="order__label">待付款</text>
+        </view>
+
+        <!-- 待使用 -->
+        <view class="order" hover-class="order--hover" bindtap="onOrderTap" data-status="待使用">
+          <image class="order__icon" src="/assets/icons/icon-mine-order-touse.png" mode="aspectFit" aria-hidden="true" />
+          <text class="order__label">待使用</text>
+        </view>
+
+        <!-- 已完成 -->
+        <view class="order" hover-class="order--hover" bindtap="onOrderTap" data-status="已完成">
+          <image class="order__icon" src="/assets/icons/icon-mine-order-done.png" mode="aspectFit" aria-hidden="true" />
+          <text class="order__label">已完成</text>
+        </view>
+
+        <!-- 已取消 -->
+        <view class="order" hover-class="order--hover" bindtap="onOrderTap" data-status="已取消">
+          <image class="order__icon" src="/assets/icons/icon-mine-order-cancel.png" mode="aspectFit" aria-hidden="true" />
+          <text class="order__label">已取消</text>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- ----------------------------------------------------------------------
+         4.2 功能菜单
+         ----------------------------------------------------------------------
+         设计稿：四行自上而下 423/500/577/653，行高 77/77/76/77。
+               每行左右内边距 20~21，左侧图标与文字间距 19（末行 20），
+               文字 18px 一级文字，右侧统一 ›。
+         ---------------------------------------------------------------------- -->
+
+    <!-- 我的预约 -->
+    <view class="menu-row menu-row--booking" hover-class="menu-row--hover" bindtap="onMenuTap" data-name="我的预约">
+      <view class="menu-row__left">
+        <image class="menu-row__icon" src="/assets/icons/icon-mine-booking.png" mode="aspectFit" aria-hidden="true" />
+        <text class="menu-row__label">我的预约</text>
+      </view>
+      <image class="chevron" src="/assets/icons/icon-chevron-right.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+
+    <!-- 我的讲解 -->
+    <view class="menu-row menu-row--guide" hover-class="menu-row--hover" bindtap="onMenuTap" data-name="我的讲解">
+      <view class="menu-row__left">
+        <image class="menu-row__icon" src="/assets/icons/icon-mine-guide.png" mode="aspectFit" aria-hidden="true" />
+        <text class="menu-row__label">我的讲解</text>
+      </view>
+      <image class="chevron" src="/assets/icons/icon-chevron-right.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+
+    <!-- 我的消息 -->
+    <view class="menu-row menu-row--message" hover-class="menu-row--hover" bindtap="onMenuTap" data-name="我的消息">
+      <view class="menu-row__left">
+        <image class="menu-row__icon" src="/assets/icons/icon-mine-message.png" mode="aspectFit" aria-hidden="true" />
+        <text class="menu-row__label">我的消息</text>
+      </view>
+      <image class="chevron" src="/assets/icons/icon-chevron-right.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+
+    <!-- 帮助与反馈
+         图标是「空心圆 + 问号」：圆圈用素材，问号按设计稿用文字（24px PingFang Medium） -->
+    <view class="menu-row menu-row--help" hover-class="menu-row--hover" bindtap="onMenuTap" data-name="帮助与反馈">
+      <view class="menu-row__left">
+        <view class="menu-row__help-icon">
+          <image class="menu-row__help-circle" src="/assets/icons/icon-mine-help.png" mode="aspectFit" aria-hidden="true" />
+          <text class="menu-row__help-mark">?</text>
+        </view>
+        <text class="menu-row__label">帮助与反馈</text>
+      </view>
+      <image class="chevron" src="/assets/icons/icon-chevron-right.png" mode="aspectFit" aria-hidden="true" />
+    </view>
+
+  </view>
+
+  <!-- ========================================================================
+       五、底部导航（自定义 TabBar）
+       ------------------------------------------------------------------------
+       样式来自 styles/tabbar.wxss（与首页 / 导览页 / 鉴赏页共用）。
+       本页为「我的」激活态：图标换 -active 深色素材，文字换一级文字 + Medium。
+       ======================================================================== -->
+  <view class="tabbar">
+    <view class="tabbar__list">
+
+      <!-- 首页 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="index">
+        <image class="tabbar__icon" src="/assets/icons/tab-home.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">首页</text>
+      </view>
+
+      <!-- 导览 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="guide">
+        <image class="tabbar__icon" src="/assets/icons/tab-guide.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">导览</text>
+      </view>
+
+      <!-- 鉴赏 -->
+      <view class="tabbar__item" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="appreciate">
+        <image class="tabbar__icon" src="/assets/icons/tab-appreciate.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">鉴赏</text>
+      </view>
+
+      <!-- 我的（激活）
+           ⚠️ 图标颜色画在 PNG 里，激活/未激活是两套素材：
+              tab-{name}.png（浅暖灰） / tab-{name}-active.png（深棕）
+              切换激活项时必须换 src，不能只加类名。 -->
+      <view class="tabbar__item tabbar__item--active" hover-class="tabbar__item--hover" bindtap="onTabTap" data-tab="mine">
+        <image class="tabbar__icon" src="/assets/icons/tab-mine-active.png" mode="aspectFit" aria-hidden="true" />
+        <text class="tabbar__label">我的</text>
+      </view>
+
+    </view>
   </view>
 
 </view>

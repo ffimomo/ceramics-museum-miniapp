@@ -1,0 +1,498 @@
+/* 底部导航（自定义 TabBar）的样式已抽到公共文件，避免各页面各写一份而走样：
+   styles/tabbar.wxss
+   ⚠️ @import 必须写在文件最前面。 */
+@import "../../styles/tabbar.wxss";
+
+/* ==========================================================================
+   pages/guide/guide.wxss — 馆内导览样式
+   --------------------------------------------------------------------------
+   设计稿基准：430 × 932 pt（iPhone 15 Pro） → 1px = 0.23256vw
+   单位方案：vw（与 app.wxss 约定一致，水平尺寸 + 字号 + 字间距走 vw）
+   色值：引用语义令牌（--text-level-1 / --border-thick / --brand-secondary 等）
+
+   结构：一、页面容器 / 二、导航栏 / 三、楼层切换（遮罩 / 楼层面板 / 悬浮按钮）
+         / 四、滚动内容区（地图 / 快捷入口 / 热门文物 / 查看更多） / 五、底部导航
+   ========================================================================== */
+
+/* ==========================================================================
+   一、页面容器
+   ========================================================================== */
+.page {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-default);
+}
+
+/* ==========================================================================
+   二、导航栏（自定义）
+   --------------------------------------------------------------------------
+   顶部由 guide.js 注入 --status-bar-h（状态栏高度），标题随之下移。
+   导航栏本体高 64。
+   ========================================================================== */
+.navbar {
+  position: relative;
+  z-index: 20;
+  padding-top: var(--status-bar-h, 44px);
+}
+
+.navbar__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(64 / 430 * 100vw);
+}
+
+.navbar__title {
+  font-family: var(--font-serif);
+  font-size: calc(24 / 430 * 100vw);
+  line-height: calc(32 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* ==========================================================================
+   三、楼层切换（遮罩 + 楼层面板 + 悬浮按钮）
+   --------------------------------------------------------------------------
+   层级：底部导航 100 < 遮罩 110 < 楼层面板 / 悬浮按钮 120
+   （遮罩需压住底部导航，面板与按钮需浮在遮罩之上）
+   ========================================================================== */
+
+/* --- 遮罩：压暗整页，点击收起 --- */
+.floor-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 110;
+  background-color: rgba(47, 47, 47, 0.5);
+  /* 设计稿遮罩右下角为 15px 圆角，会在屏幕右下角露出底部导航的白色直角 */
+  border-bottom-right-radius: calc(15 / 430 * 100vw);
+}
+
+/* --- 楼层面板：96 × 330，仅右下角 15px 圆角 --- */
+.floor-panel {
+  position: fixed;
+  /*
+   * ⚠️ 必须与 .side-entry 的 top 完全一致（状态栏 + 74）
+   * ------------------------------------------------------------------
+   * 展开态下「楼层面板」和右侧的 « 按钮是同一个高度起头的（设计稿两者上沿平齐）。
+   * 早先面板是 +64、按钮是 +74，差 10px —— 真机上就是面板顶边比按钮高一截、
+   * 两者拼不成一个整块。
+   */
+  top: calc(var(--status-bar-h, 44px) + 74 / 430 * 100vw);
+  left: 0;
+  z-index: 120;
+  width: calc(96 / 430 * 100vw);
+  height: calc(330 / 430 * 100vw);
+  overflow: hidden;
+  border-radius: 0 0 calc(15 / 430 * 100vw) 0;
+}
+
+.floor-panel__list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 楼层项：四等分（各 82.5），32px 居中，默认灰米底 + 二级文字 */
+.floor-panel__item {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--border-default);
+  font-family: var(--font-sans);
+  font-weight: 500; /* 设计稿：PingFang SC Medium（系统真字重，非合成加粗） */
+  font-size: calc(32 / 430 * 100vw);
+  line-height: calc(45 / 430 * 100vw);
+  color: var(--text-level-2);
+}
+
+/* 当前楼层：辅助色底 + 反色文字 */
+.floor-panel__item--active {
+  background-color: var(--icon-secondary);
+  color: var(--text-inverse);
+}
+
+.floor-panel__item--hover {
+  opacity: 0.85;
+}
+
+/* --- 悬浮按钮：收起态在屏幕左缘，展开态右移到面板右侧 --- */
+.side-entry {
+  position: fixed;
+  /*
+   * top = 状态栏 + 74 → 设计稿实测按钮上沿在 y=128。
+   * ⚠️ 地图素材（img/guide-map.jpg）里也烤着同一个按钮（设计稿就是这么叠的），
+   *    这一层必须和它【严格重合】才能盖住，早先写 64（= y118）会露出发白的边。
+   */
+  top: calc(var(--status-bar-h, 44px) + 74 / 430 * 100vw);
+  left: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(46 / 430 * 100vw);
+  height: calc(72 / 430 * 100vw);
+  background-color: var(--icon-secondary);
+  border-radius: 0 calc(10 / 430 * 100vw) calc(10 / 430 * 100vw) 0;
+}
+
+/* 展开态：紧贴 96 宽面板的右缘 */
+.side-entry--open {
+  left: calc(96 / 430 * 100vw);
+}
+
+.side-entry--hover {
+  opacity: 0.85;
+}
+
+/* 双箭头（收起态 ›› / 展开态 ‹‹），16.5 × 14.17 */
+.side-entry__icon {
+  width: calc(16.5 / 430 * 100vw);
+  height: calc(14.17 / 430 * 100vw);
+}
+
+/* ==========================================================================
+   四、滚动内容区
+   --------------------------------------------------------------------------
+   左右各 14 安全边距（内容宽 402）；顶部距导航栏下沿 11。
+   底部预留 TabBar 高度，避免「查看更多」被固定导航遮挡。
+   ========================================================================== */
+.scroll {
+  position: absolute;
+  /* 新版设计稿：地图顶边在 y=126（= 状态栏 54 + 72） */
+  top: calc(var(--status-bar-h, 44px) + 72 / 430 * 100vw);
+  right: calc(14 / 430 * 100vw);
+  left: calc(14 / 430 * 100vw);
+  bottom: 0;
+  z-index: 10;
+}
+
+.scroll__inner {
+  /*
+   * 底部给底栏让位。用公共变量而不是写死数值 ——
+   * 原来这里是 68 + 安全区（当初按导览页那份 68 高的旧底栏算的），
+   * 底栏改版后对不上了，改成引用 styles/tabbar.wxss 的 --tabbar-h。
+   */
+  padding-bottom: var(--tabbar-h);
+}
+
+/* --------------------------------------------------------------------------
+   1. 馆内地图（376 × 465）
+   -------------------------------------------------------------------------- */
+/*
+ * 馆内地图
+ * 新版设计稿换了插画，尺寸也从 376 × 465 变成 399.5 × 466，
+ * 左边缘落在 x=16（滚动区左边距 14 + 这里 2）。
+ * 素材 img/guide-map.jpg 就是按 399.5 × 466 从 @2x 设计稿裁的，
+ * 并已把压在左上角的「楼层切换按钮」补掉（否则会和页面上的 .side-entry 叠两层）。
+ */
+.guide-map {
+  width: calc(399.5 / 430 * 100vw);
+  height: calc(466 / 430 * 100vw);
+  margin-left: calc(2 / 430 * 100vw);
+}
+
+.guide-map__img {
+  width: 100%;
+  height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. 快捷入口（376 × 68）
+   --------------------------------------------------------------------------
+   1.5px 描边圆角条。用 inset 阴影代替 border，使内容盒等于设计尺寸 376，
+   4 个入口等距（间距 94），圆心落在 44 / 138 / 232 / 326。
+   ========================================================================== */
+.quick {
+  position: relative;
+  /* 与地图同宽同左基准，两者上下对齐 */
+  width: calc(399.5 / 430 * 100vw);
+  height: calc(68 / 430 * 100vw);
+  margin-left: calc(2 / 430 * 100vw);
+  border-radius: calc(15 / 430 * 100vw);
+  box-shadow: inset 0 0 0 calc(1.5 / 430 * 100vw) var(--border-thick);
+}
+
+/* 首项左移 3，使圆心对齐设计稿（-3 + 94/2 = 44） */
+/*
+ * 快捷入口一行
+ * --------------------------------------------------------------------------
+ * 设计稿：四个入口在 399.5 宽的描边条里【四等分铺满】，图标中心间距 100。
+ * ⚠️ 早期是「固定 94 宽 + 从左排」：四个 94 只有 376，比条子短 23，
+ *    于是整排贴左、右边空出一截，最后一个「票务中心」明显往里挤。
+ *    改成 flex: 1 四等分后，四个中心落在 66 / 166 / 266 / 366，与设计稿一致。
+ */
+.quick__list {
+  position: absolute;
+  top: calc(10 / 430 * 100vw);
+  right: 0;
+  left: 0;
+  display: flex;
+}
+
+.quick__item {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quick__item--hover {
+  opacity: 0.7;
+}
+
+/* 30 × 30 描边圆圈，图标居中 */
+.quick__circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(30 / 430 * 100vw);
+  height: calc(30 / 430 * 100vw);
+  border: 1px solid var(--icon-secondary);
+  border-radius: 50%;
+}
+
+/* 图标尺寸按设计稿实际字形，不做统一缩放 */
+.quick__icon--locate {
+  width: calc(13.6 / 430 * 100vw);
+  height: calc(16.27 / 430 * 100vw);
+}
+
+.quick__icon--toilet {
+  width: calc(20 / 430 * 100vw);
+  height: calc(20 / 430 * 100vw);
+  opacity: 0.6;
+}
+
+.quick__icon--water {
+  width: calc(15.6 / 430 * 100vw);
+  height: calc(14.93 / 430 * 100vw);
+}
+
+.quick__icon--ticket {
+  width: calc(19 / 430 * 100vw);
+  height: calc(19 / 430 * 100vw);
+  opacity: 0.7;
+}
+
+.quick__label {
+  margin-top: calc(4 / 430 * 100vw);
+  font-family: var(--font-sans);
+  font-size: calc(12 / 430 * 100vw);
+  line-height: calc(15 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+/* --------------------------------------------------------------------------
+   3. 热门文物（402 宽，内含标题 + 3 张文物卡）
+   --------------------------------------------------------------------------
+   同用 inset 阴影描边：内容盒 = 402，卡片左边距 24 即为设计值。
+   上下内边距 14，总高 14 + 27 + 16 + 128×3 + 16×2 + 14 = 487。
+   ========================================================================== */
+/*
+ * 热门文物大框
+ * --------------------------------------------------------------------------
+ * 新版设计稿：左边缘 x=16（与地图同一条基准线），宽度 399.5。
+ * ⚠️「查看更多」按钮在这个框【内部】（见 WXML），由这里的内边距兜住底部留白。
+ */
+.relics {
+  width: calc(399.5 / 430 * 100vw);
+  margin-top: calc(16 / 430 * 100vw);
+  margin-left: calc(2 / 430 * 100vw);
+  padding: calc(14 / 430 * 100vw) 0;
+  border-radius: calc(15 / 430 * 100vw);
+  box-shadow: inset 0 0 0 calc(1.5 / 430 * 100vw) var(--border-thick);
+}
+
+/* --- 3.1 区块标题（陶瓷图标 24 + 「热门文物」20px） --- */
+.relics__head {
+  position: relative;
+  height: calc(27 / 430 * 100vw);
+  margin: 0 0 calc(16 / 430 * 100vw) calc(20 / 430 * 100vw);
+}
+
+.relics__head-icon {
+  position: absolute;
+  top: calc(2 / 430 * 100vw);
+  left: 0;
+  width: calc(24 / 430 * 100vw);
+  height: calc(24 / 430 * 100vw);
+  opacity: 0.6;
+}
+
+.relics__head-title {
+  position: absolute;
+  top: 0;
+  left: calc(30 / 430 * 100vw);
+  font-family: var(--font-serif);
+  font-size: calc(20 / 430 * 100vw);
+  line-height: calc(27 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* --- 3.2 文物卡（351 × 128） --- */
+.relic-card {
+  display: flex;
+  align-items: stretch;
+  width: calc(351 / 430 * 100vw);
+  height: calc(128 / 430 * 100vw);
+  margin-left: calc(24 / 430 * 100vw);
+  padding-right: calc(36 / 430 * 100vw);
+  background-color: rgba(200, 179, 155, 0.1);
+  border: calc(1 / 430 * 100vw) solid var(--border-thick);
+  border-radius: calc(10 / 430 * 100vw);
+}
+
+.relic-card + .relic-card {
+  margin-top: calc(16 / 430 * 100vw);
+}
+
+.relic-card--hover {
+  opacity: 0.85;
+}
+
+/* 文物图：123 宽，随卡片通高 */
+.relic-card__pic {
+  flex: none;
+  width: calc(123 / 430 * 100vw);
+  height: 100%;
+  overflow: hidden;
+  border: calc(1 / 430 * 100vw) solid var(--border-thick);
+  border-radius: calc(10 / 430 * 100vw);
+}
+
+.relic-card__img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 文物信息列：175 宽，上下内边距 8，行间距 7 */
+.relic-card__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  margin-left: calc(15 / 430 * 100vw);
+  padding: calc(8 / 430 * 100vw) 0;
+}
+
+.relic-card__row {
+  display: flex;
+  align-items: center;
+  height: calc(26 / 430 * 100vw);
+}
+
+/* 排名圆标：26 × 26，橄榄绿 80% */
+.relic-card__rank {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(26 / 430 * 100vw);
+  height: calc(26 / 430 * 100vw);
+  margin-right: calc(12 / 430 * 100vw);
+  background-color: rgba(113, 124, 83, 0.8);
+  border-radius: 50%;
+}
+
+.relic-card__rank-num {
+  font-family: var(--font-serif);
+  font-size: calc(18 / 430 * 100vw);
+  line-height: 1;
+  color: var(--text-inverse);
+}
+
+.relic-card__name {
+  font-family: var(--font-serif);
+  font-size: calc(16 / 430 * 100vw);
+  line-height: calc(21 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* 年代 / 展厅（两行，行距 4） */
+.relic-card__meta {
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(7 / 430 * 100vw);
+}
+
+.relic-card__meta-line {
+  font-family: var(--font-serif);
+  font-size: calc(13 / 430 * 100vw);
+  line-height: calc(17 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-2);
+}
+
+.relic-card__meta-line + .relic-card__meta-line {
+  margin-top: calc(4 / 430 * 100vw);
+}
+
+/* 排队时长胶囊（高 32，浅杏底 + 描边） */
+.relic-card__queue {
+  display: flex;
+  align-items: center;
+  height: calc(32 / 430 * 100vw);
+  margin-top: calc(7 / 430 * 100vw);
+  padding: 0 calc(59 / 430 * 100vw) 0 calc(10 / 430 * 100vw);
+  background-color: rgba(200, 179, 155, 0.5);
+  border: calc(1 / 430 * 100vw) solid var(--border-thick);
+  border-radius: calc(15 / 430 * 100vw);
+}
+
+.relic-card__queue-icon {
+  flex: none;
+  width: calc(16 / 430 * 100vw);
+  height: calc(16 / 430 * 100vw);
+  margin-right: calc(10 / 430 * 100vw);
+}
+
+.relic-card__queue-text {
+  font-family: var(--font-sans);
+  font-size: calc(14 / 430 * 100vw);
+  line-height: calc(20 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-level-1);
+}
+
+/* 「排队约」「min」为 12px，中间数字为 14px */
+.relic-card__queue-unit {
+  font-size: calc(12 / 430 * 100vw);
+}
+
+/* --------------------------------------------------------------------------
+   4. 查看更多按钮（166 × 42，品牌辅助色填充）
+   -------------------------------------------------------------------------- */
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(166 / 430 * 100vw);
+  height: calc(42 / 430 * 100vw);
+  /* 现在在 .relics 框内部，上间距 = 与上一张文物卡的留白；框的 padding-bottom 兜底边 */
+  margin: calc(24 / 430 * 100vw) auto 0;
+  background-color: var(--brand-secondary);
+  border: calc(1 / 430 * 100vw) solid var(--brand-primary);
+  border-radius: calc(16 / 430 * 100vw);
+}
+
+.more--hover {
+  opacity: 0.85;
+}
+
+.more__text {
+  font-family: var(--font-sans);
+  font-size: calc(16 / 430 * 100vw);
+  line-height: calc(22 / 430 * 100vw);
+  white-space: nowrap;
+  color: var(--text-inverse);
+}

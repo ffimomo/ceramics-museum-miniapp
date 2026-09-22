@@ -1,0 +1,102 @@
+<!-- ==========================================================================
+     pages/booking/booking.wxml — 预约页（票务预约）
+     --------------------------------------------------------------------------
+     设计稿：Figma「预约页」（node 15-254），基准 430 × 932（iPhone 15 Pro）
+     结构（自上而下）：
+       一、导航栏（返回 + 标题「票务预约」，自定义导航）
+       二、公告卡片（预约公告 / 参馆须知）
+       三、Tab 切换（普通参馆〔激活〕 / 特色展览参馆）
+       四、预约选项卡片（个人预约 / 团队预约 / 志愿者服务）
+       五、用户中心按钮（品牌主色 CTA）
+
+     ⚠️ 图标：
+       个人/团队图标 → /assets/icons/icon-booking-*.png
+       返回箭头、爱心 → 内联 SVG（data URI，沿用项目「小图形用 SVG」惯例）
+     ========================================================================== -->
+<view class="page page-fade {{entering || leaving ? 'page-fade--hidden' : ''}}" style="{{safeAreaStyle}}">
+
+  <!-- ========================================================================
+       一、导航栏
+       ------------------------------------------------------------------------
+       navigationStyle: custom，顶部由 JS 注入 --status-bar-h 避开状态栏。
+       ======================================================================== -->
+  <view class="navbar">
+    <view class="navbar__bar">
+      <!-- 返回按钮（48×48 点击区） -->
+      <view class="navbar__back" hover-class="navbar__back--hover" bindtap="onBack" aria-label="返回">
+        <view class="navbar__chevron" aria-hidden="true" />
+      </view>
+      <!-- 标题 -->
+      <text class="navbar__title">票务预约</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       二、公告卡片（预约公告 / 参馆须知）
+       ======================================================================== -->
+  <view class="notice">
+    <!-- 预约公告 -->
+    <text class="notice__title notice__title--notice">预约公告</text>
+    <text class="notice__body">为保障参观秩序与文物安全，实行实名制预约参观制度，请您提前预约，礼貌参馆。</text>
+
+    <!-- 参馆须知 -->
+    <text class="notice__title notice__title--rules">参馆须知</text>
+    <view class="notice__list">
+      <text>1.参观需携带有效身份证件</text>
+      <text>2.请遵守馆内秩序，请勿大声喧哗</text>
+      <text>3.请勿携带易燃易爆物品入馆</text>
+      <text>4.下午五点闭馆，请留意参观时间</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       三、Tab 切换（普通参馆 / 特色展览参馆）
+       ------------------------------------------------------------------------
+       普通参馆为当前激活态（深色文字 + 品牌主色下划线）。
+       ======================================================================== -->
+  <view class="tabs">
+    <view class="tabs__item tabs__item--active" hover-class="tabs__item--hover" bindtap="onTabTap" data-tab="normal">
+      <text class="tabs__label">普通参馆</text>
+      <view class="tabs__underline" aria-hidden="true" />
+    </view>
+    <view class="tabs__item" hover-class="tabs__item--hover" bindtap="onTabTap" data-tab="special">
+      <text class="tabs__label">特色展览参馆</text>
+    </view>
+  </view>
+
+  <!-- ========================================================================
+       四、预约选项卡片
+       ------------------------------------------------------------------------
+       三张并列选项：个人预约 / 团队预约 / 志愿者服务
+       结构统一：左侧图标 + 右侧（标题 + 副标题）。
+       ======================================================================== -->
+
+  <!-- 个人预约 -->
+  <view class="booking-card" hover-class="card-hover" bindtap="onCardTap" data-name="个人预约">
+    <image class="booking-card__icon booking-card__icon--person" src="/assets/icons/icon-booking-person.png" mode="aspectFit" aria-hidden="true" />
+    <text class="booking-card__title">个人预约</text>
+    <text class="booking-card__sub">适用于个人参观</text>
+  </view>
+
+  <!-- 团队预约 -->
+  <view class="booking-card" hover-class="card-hover" bindtap="onCardTap" data-name="团队预约">
+    <image class="booking-card__icon booking-card__icon--team" src="/assets/icons/icon-booking-team.png" mode="aspectFit" aria-hidden="true" />
+    <text class="booking-card__title">团队预约</text>
+    <text class="booking-card__sub">适用于10人及以上团队</text>
+  </view>
+
+  <!-- 志愿者服务 -->
+  <view class="booking-card" hover-class="card-hover" bindtap="onCardTap" data-name="志愿者服务">
+    <view class="booking-card__icon booking-card__heart" aria-hidden="true" />
+    <text class="booking-card__title">志愿者服务</text>
+    <text class="booking-card__sub">加入我们，为传承奉献一份力量</text>
+  </view>
+
+  <!-- ========================================================================
+       五、用户中心按钮
+       ======================================================================== -->
+  <view class="btn-user" hover-class="btn-user--hover" bindtap="onUserCenter">
+    <text class="btn-user__text">用户中心</text>
+  </view>
+
+</view>

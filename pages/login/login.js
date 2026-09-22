@@ -20,6 +20,8 @@ const util = require('../../utils/util');
 /** 记住密码的存储 key */
 const REMEMBER_KEY = 'remember_login';
 
+const transition = require('../../utils/transition');
+
 Page({
   data: {
     /* ======================================================================
@@ -28,9 +30,11 @@ Page({
        ⚠️ 修改图片只需改这里，不用动 WXML
        ====================================================================== */
     /** 背景图：米黄宣纸 / 陶瓷质感
-     *  ⚠️ 已转为 WebP（原 PNG 560.8KB -> WebP 21.0KB，省 96.3%，PSNR 41.6dB）
+     *  ⚠️ 已从 WebP 改为 JPG（原 PNG 560.8KB -> JPG 50KB）
+     *     原因：iOS 真机的 <image> 对 WebP 支持不稳定，背景会加载失败不显示；
+     *     JPG 在 iOS / Android 真机均稳定支持，且背景图为不透明照片，无损于质量。
      *     原图备份在 assets/_originals_png/ */
-    bgImage: '../../assets/images/login-bg.webp',
+    bgImage: '../../assets/images/login-bg.jpg',
     /** 品牌 Logo：花瓶线稿 */
     logoImage: '../../assets/icons/login-logo.png',
     /** 手机号输入框左侧 icon：书签样式（Bookmark） */
@@ -83,6 +87,11 @@ Page({
 
     /** 状态栏高度 CSS 变量，绑定到根节点 style */
     safeAreaStyle: '--status-bar-h: 44px;',
+
+    /** 转场：入场中（首帧透明，再淡入） */
+    entering: true,
+    /** 转场：退场中（跳转前先淡出） */
+    leaving: false,
   },
 
   /* ========================================================================
@@ -94,6 +103,21 @@ Page({
     this.restoreRememberedAccount();
   },
 
+  /** 首帧上屏后触发淡入（见 utils/transition.js） */
+  onReady() {
+    transition.enter(this);
+  },
+
+  /**
+   * 页面重新显示：重置退场态
+   * 本页目前唯一的跳转是 reLaunch（会销毁本页），理论上不会带着 leaving 被隐藏；
+   * 但「注册 / 忘记密码」两个入口以后接上真实页面就会变成 navigateTo，
+   * 那时若漏了这一步，返回登录页就是一片空白 —— 先按统一规则接上。
+   */
+  onShow() {
+    transition.resume(this);
+  },
+
   /**
    * 页面卸载：清理可能存在的定时器
    */
@@ -101,6 +125,7 @@ Page({
     if (this._loginTimer) {
       clearTimeout(this._loginTimer);
     }
+    transition.clear(this);
   },
 
   /* ========================================================================
@@ -118,20 +143,15 @@ Page({
           ? wx.getWindowInfo()
           : wx.getSystemInfoSync();
 
-      let statusBarHeight = windowInfo.statusBarHeight || 44;
+      const statusBarHeight = windowInfo.statusBarHeight || 44;
 
-      if (typeof wx.getMenuButtonBoundingClientRect === 'function') {
-        try {
-          const capsule = wx.getMenuButtonBoundingClientRect();
-          if (capsule && capsule.height) {
-            const capsuleBottom = capsule.top + capsule.height;
-            statusBarHeight = Math.max(statusBarHeight, capsuleBottom);
-          }
-        } catch (capErr) {
-          console.warn('[login] 获取胶囊位置失败，回退状态栏高度:', capErr);
-        }
-      }
-
+      /*
+       * ⚠️ 与 splash.js 一致：只用状态栏高度，不并入胶囊按钮底部。
+       * ------------------------------------------------------------------
+       * 品牌区是水平居中的（设计稿 x 183–246），表单区首行在 y≈374，
+       * 都远离右上角的胶囊（x 约 278–365 / y 约 54–86），不存在遮挡风险。
+       * 并入胶囊底会把顶部留白从 50 抬到 82，整页内容被下推约 32px。
+       */
       this.setData({
         safeAreaStyle: `--status-bar-h: ${statusBarHeight}px;`,
       });
@@ -321,7 +341,9 @@ Page({
       util.toast('登录成功', 'success');
 
       setTimeout(() => {
-        wx.reLaunch({ url: '/pages/index/index' });
+        transition.leave(this, () => {
+          wx.reLaunch({ url: '/pages/index/index' });
+        });
       }, 800);
     }, 800);
     // ---------------------------------------------------------------------
